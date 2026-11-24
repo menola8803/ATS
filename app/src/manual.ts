@@ -1,6 +1,6 @@
 // The manual inside the app (Settings › Manual), in both languages. Update it for every change a user can see, and set
 // the version to the app's version (the tests check that).
-export const MANUAL_VERSION = '0.1.2';
+export const MANUAL_VERSION = '0.1.3';
 
 export type ManualSection = { title: string; items: string[] };
 
@@ -24,6 +24,12 @@ const sv: ManualSection[] = [
     'Flikarna Original och Förbättrad visar din text eller den nya texten.',
     'Stycken som redan är bra märks ATS-vänligt.',
     'AI-förslagen kräver en egen API-nyckel från Anthropic, som du lägger in under Inställningar › AI-förslag.',
+  ] },
+  { title: 'API-nyckel', items: [
+    'API-nyckeln är ett slags lösenord som kopplar ATS till ditt konto hos Anthropic, företaget bakom Claude. Varje förslag kostar en liten summa som dras från ditt saldo där.',
+    'Skaffa en: logga in på console.anthropic.com, fyll på saldo under Billing, gå till API Keys och tryck Create Key.',
+    'Kopiera nyckeln (den börjar med sk-ant- och visas bara en gång), klistra in den under Inställningar › AI-förslag, tryck Spara nyckeln och sedan Testa nyckeln.',
+    'Nyckeln sparas krypterat på telefonen och skickas bara till Anthropic när du trycker Få AI-förslag.',
   ] },
   { title: 'Ärlighetsspärr', items: [
     'Ärlighetsspärren är alltid på: AI:n lägger aldrig till erfarenheter, siffror, verktyg eller utbildningar som inte finns i ditt CV.',
@@ -77,6 +83,12 @@ const en: ManualSection[] = [
     'The Original and Improved tabs show your text or the new text.',
     'Paragraphs that are already good are marked ATS-friendly.',
     'AI suggestions need your own API key from Anthropic, which you add under Settings › AI suggestions.',
+  ] },
+  { title: 'API key', items: [
+    'The API key is a kind of password that connects ATS to your account at Anthropic, the company behind Claude. Each suggestion costs a small amount, taken from your balance there.',
+    'Get one: sign in at console.anthropic.com, add credit under Billing, go to API Keys and tap Create Key.',
+    'Copy the key (it starts with sk-ant- and is only shown once), paste it under Settings › AI suggestions, tap Save the key and then Test key.',
+    'The key is stored encrypted on the phone and only sent to Anthropic when you tap Get AI suggestions.',
   ] },
   { title: 'Honesty lock', items: [
     'The honesty lock is always on: the AI never adds experience, numbers, tools or education that are not in your CV.',

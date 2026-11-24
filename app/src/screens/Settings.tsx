@@ -31,6 +31,8 @@ export default function Settings({ go, glow }: { go: (r: 'manual' | 'privacy' | 
   const look = useButtonLook();
   const [key, setKey] = useState('');
   const [keyState, setKeyState] = useState<'idle' | 'testing' | 'ok' | 'bad'>('idle');
+  const [how, setHow] = useState(!app.apiKey);
+  const badFormat = !!key.trim() && !key.trim().startsWith('sk-ant-');
   const version = Constants.expoConfig?.version ?? '';
 
   const saveKey = async () => { if (key.trim()) { await app.setApiKey(key); setKey(''); setKeyState('idle'); } };
@@ -90,7 +92,23 @@ export default function Settings({ go, glow }: { go: (r: 'manual' | 'privacy' | 
         <Text style={{ fontSize: 13, color: theme.muted }}>{t.model}</Text>
         <Segmented<ModelKey> value={app.model} onChange={v => app.setPrefs({ model: v })} options={[['fast', t.modelFast], ['best', t.modelBest]]} />
         <Text style={{ fontSize: 12.5, color: theme.muted }}>{app.model === 'fast' ? t.modelFastNote : t.modelBestNote}</Text>
-        <Text style={{ fontSize: 13, color: theme.muted }}>{t.apiKey}</Text>
+        <Text style={{ fontSize: 15.5, fontWeight: '700', color: theme.ink }}>{t.apiKey}</Text>
+        <Text style={{ fontSize: 13, lineHeight: 19, color: theme.muted, marginTop: -6 }}>{t.keyWhat}</Text>
+        <Pressable accessibilityRole="button" accessibilityState={{ expanded: how }} onPress={() => setHow(v => !v)} style={{ minHeight: 40, justifyContent: 'center' }}>
+          <Text style={{ fontSize: 14, fontWeight: '700', color: look.fg }}>{`${how ? '▾' : '▸'}  ${t.keyHow}`}</Text>
+        </Pressable>
+        {how ? (
+          <View style={{ gap: 8, padding: 12, borderRadius: 16, backgroundColor: theme.chip }}>
+            {(t.keySteps as unknown as string[]).map((st, i) => (
+              <View key={i} style={{ flexDirection: 'row', gap: 10 }}>
+                <View style={{ width: 22, height: 22, borderRadius: 11, borderWidth: 1, borderColor: look.border, alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ fontSize: 12, fontWeight: '700', color: look.fg }}>{i + 1}</Text>
+                </View>
+                <Text style={{ flex: 1, fontSize: 13.5, lineHeight: 19, color: theme.ink }}>{st}</Text>
+              </View>
+            ))}
+          </View>
+        ) : null}
         <TextInput value={key} onChangeText={v => { setKey(v); setKeyState('idle'); }} placeholder={app.apiKey ? '••••••••••••' + app.apiKey.slice(-4) : t.apiKeyPh} placeholderTextColor={theme.muted}
           secureTextEntry autoCapitalize="none" autoCorrect={false} accessibilityLabel={t.apiKey}
           style={{ minHeight: 48, borderRadius: 14, borderWidth: 1, borderColor: theme.line, backgroundColor: theme.chip, color: theme.ink, paddingHorizontal: 14, fontSize: 15 }} />
@@ -101,6 +119,7 @@ export default function Settings({ go, glow }: { go: (r: 'manual' | 'privacy' | 
             {keyState === 'ok' ? t.keyOk : keyState === 'bad' ? t.keyBad : app.apiKey ? t.keySaved : t.keyNone}
           </Text>
         </View>
+        {badFormat ? <Text style={{ fontSize: 12.5, lineHeight: 18, color: theme.danger }}>{t.keyFormat}</Text> : null}
         <Text style={{ fontSize: 12.5, lineHeight: 18, color: theme.muted }}>{t.keyNote}</Text>
         <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
           <SmallBtn title={t.getKey} onPress={() => Linking.openURL('https://console.anthropic.com').catch(() => {})} />
