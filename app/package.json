@@ -1,0 +1,40 @@
+{
+  "name": "ats",
+  "version": "0.1.0",
+  "main": "index.ts",
+  "dependencies": {
+    "@expo-google-fonts/cinzel": "^0.4.2",
+    "@expo-google-fonts/plus-jakarta-sans": "^0.4.2",
+    "@react-native-async-storage/async-storage": "^2.2.0",
+    "expo": "~58.0.20",
+    "expo-asset": "~58.0.20",
+    "expo-build-properties": "~58.0.11",
+    "expo-constants": "^58.0.13",
+    "expo-document-picker": "~58.0.4",
+    "expo-file-system": "^58.0.12",
+    "expo-font": "^58.0.10",
+    "expo-intent-launcher": "^58.0.3",
+    "expo-localization": "~58.0.5",
+    "expo-secure-store": "~58.0.2",
+    "expo-sharing": "~58.0.21",
+    "expo-splash-screen": "~58.0.11",
+    "expo-status-bar": "~58.0.4",
+    "fflate": "^0.8.3",
+    "react": "19.3.0",
+    "react-native": "0.88.0",
+    "react-native-safe-area-context": "~5.10.1",
+    "react-native-svg": "^15.16.0"
+  },
+  "devDependencies": {
+    "@types/react": "~19.3.0",
+    "tsx": "^4.23.15",
+    "typescript": "~6.0.3"
+  },
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "test": "tsx test/docx.test.ts && tsx test/odt.test.ts && tsx test/ats.test.ts && tsx test/ai.test.ts && tsx test/manual.test.ts && tsx test/update.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "private": true
+}

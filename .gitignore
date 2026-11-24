@@ -1,0 +1,6 @@
+.DS_Store
+# Signeringsnyckeln och lösenordet hamnar aldrig i git
+keystore.properties
+nycklar/
+*.p12
+*.jks
