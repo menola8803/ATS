@@ -29,7 +29,7 @@ import Settings, { ManualScreen, PrivacyScreen, UpdateScreen } from './src/scree
 const UPDATE_EVERY = 6 * 3600 * 1000;
 
 function Content() {
-  const { ready, updateTag, updateChecked, updateAuto, setPrefs, addRecent, removeRecent, t } = useApp();
+  const { ready, updateTag, updateChecked, updateAuto, folderMade, setPrefs, addRecent, removeRecent, t } = useApp();
   const session = useDoc();
   const [stack, setStack] = useState<Route[]>([{ name: 'tabs' }]);
   const [tab, setTab] = useState<TabName>('home');
@@ -43,6 +43,12 @@ function Content() {
 
   // ATS is open: the "ATS is updated" notification is not needed any more.
   useEffect(() => { try { AtsNativeModule?.clearUpdateNotice(); } catch {} }, []);
+  // Download/ATS is created on the first start, so the folder is there before anything is saved.
+  useEffect(() => {
+    if (!ready || folderMade || !AtsNativeModule) return;
+    AtsNativeModule.makeFolder(t.folderNote).then(ok => { if (ok) setPrefs({ folderMade: true }); }).catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready]);
   // Look for a new version now and then; the gear glows when there is one.
   useEffect(() => {
     if (!ready || !updateAuto || Date.now() - updateChecked < UPDATE_EVERY) return;

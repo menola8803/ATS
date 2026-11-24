@@ -1,5 +1,8 @@
 # Nyheter i ATS
 
+## 0.1.1
+- Mappen Download/ATS skapas direkt när appen startas första gången, med en kort förklaring (ATS.txt) i. Tidigare kom mappen först när det första CV:t sparades.
+
 ## 0.1.0
 - Första versionen av ATS: utvärdera ditt CV i Word (.docx) eller ODT och få en ATS-poäng från 0 till 100.
 - AI-förslag för varje stycke som kan bli bättre, med ärlighetsspärr: AI:n hittar aldrig på fakta, och saknas en siffra blir det en platshållare som du fyller i.

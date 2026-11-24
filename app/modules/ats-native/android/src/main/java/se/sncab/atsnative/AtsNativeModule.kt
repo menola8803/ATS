@@ -43,6 +43,24 @@ class AtsNativeModule : Module() {
       mapOf("uri" to uri.toString(), "name" to saved)
     }
 
+    // Creates Download/ATS on the phone right away (Android only makes a folder when a file is put in it):
+    // a short note "ATS.txt" is saved there unless the folder already has a file from ATS.
+    AsyncFunction("makeFolder") { note: String ->
+      if (Build.VERSION.SDK_INT < 29) return@AsyncFunction false
+      val r = ctx.contentResolver
+      val has = r.query(MediaStore.Downloads.EXTERNAL_CONTENT_URI, arrayOf(MediaStore.Downloads._ID),
+        "${MediaStore.Downloads.RELATIVE_PATH} LIKE ?", arrayOf("$folder/%"), null)?.use { it.count > 0 } ?: false
+      if (has) return@AsyncFunction true
+      val values = ContentValues().apply {
+        put(MediaStore.Downloads.DISPLAY_NAME, "ATS.txt")
+        put(MediaStore.Downloads.MIME_TYPE, "text/plain")
+        put(MediaStore.Downloads.RELATIVE_PATH, folder)
+      }
+      val uri = r.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values) ?: return@AsyncFunction false
+      r.openOutputStream(uri)?.use { it.write(note.toByteArray()) }
+      true
+    }
+
     AsyncFunction("listDownloads") {
       val out = mutableListOf<Map<String, Any?>>()
       if (Build.VERSION.SDK_INT < 29) return@AsyncFunction out

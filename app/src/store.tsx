@@ -22,6 +22,7 @@ type Saved = {
   scores: Record<string, { score: number; at: number }>; // latest ATS score per document key
   recent: Recent[];
   updateTag: string; updateChecked: number; updateAuto: boolean;
+  folderMade: boolean;        // Download/ATS has been created
 };
 
 const KEY = 'ats.state.v1';
@@ -31,7 +32,7 @@ const MAX_RECENT = 40;
 const phoneLang = (): Lang => { try { return getLocales()[0]?.languageCode === 'sv' ? 'sv' : 'en'; } catch { return 'en'; } };
 const empty = (): Saved => ({
   themeName: 'dark', lang: phoneLang(), model: 'fast', count: 2, tone: 'neutral', useAd: true, showDemo: true, ad: '',
-  scores: {}, recent: [], updateTag: '', updateChecked: 0, updateAuto: true,
+  scores: {}, recent: [], updateTag: '', updateChecked: 0, updateAuto: true, folderMade: false,
 });
 
 type Prefs = Omit<Saved, 'scores' | 'recent'>;

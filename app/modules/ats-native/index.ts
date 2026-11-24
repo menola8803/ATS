@@ -6,6 +6,8 @@ export type DownloadFile = { uri: string; name: string; size: number; modified: 
 type AtsNative = {
   /** Saves a file in Download/ATS. Android picks a new name if the name is taken; the name used is returned. */
   saveDownload(name: string, base64: string, mime: string): Promise<SavedFile>;
+  /** Creates Download/ATS with a short note in it (true when the folder is there). */
+  makeFolder(note: string): Promise<boolean>;
   /** The .docx and .odt files ATS has saved in Download/ATS, newest first. */
   listDownloads(): Promise<DownloadFile[]>;
   /** Reads a file (content:// or file://) as Base64. */
