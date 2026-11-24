@@ -1,5 +1,8 @@
 # What's new in ATS
 
+## 0.1.2
+- The app starts in English. Swedish can be chosen under Settings › Language.
+
 ## 0.1.1
 - The Download/ATS folder is created right away when the app starts for the first time, with a short note (ATS.txt) in it. Before, the folder only appeared when the first CV was saved.
 

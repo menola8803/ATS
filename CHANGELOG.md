@@ -1,5 +1,8 @@
 # Nyheter i ATS
 
+## 0.1.2
+- Appen startar på engelska. Svenska väljs under Inställningar › Språk.
+
 ## 0.1.1
 - Mappen Download/ATS skapas direkt när appen startas första gången, med en kort förklaring (ATS.txt) i. Tidigare kom mappen först när det första CV:t sparades.
 

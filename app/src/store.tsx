@@ -1,7 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
-import { getLocales } from 'expo-localization';
 import { Theme, ThemeName, themes } from './theme';
 import { dict, Lang, Strings } from './i18n';
 import type { Kind } from './core/cv';
@@ -29,9 +28,8 @@ const KEY = 'ats.state.v1';
 const API_KEY = 'ats.apikey.v1';
 const MAX_RECENT = 40;
 
-const phoneLang = (): Lang => { try { return getLocales()[0]?.languageCode === 'sv' ? 'sv' : 'en'; } catch { return 'en'; } };
 const empty = (): Saved => ({
-  themeName: 'dark', lang: phoneLang(), model: 'fast', count: 2, tone: 'neutral', useAd: true, showDemo: true, ad: '',
+  themeName: 'dark', lang: 'en', model: 'fast', count: 2, tone: 'neutral', useAd: true, showDemo: true, ad: '',
   scores: {}, recent: [], updateTag: '', updateChecked: 0, updateAuto: true, folderMade: false,
 });
 
@@ -60,7 +58,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         if (raw) {
           const merged = { ...empty(), ...JSON.parse(raw) } as Saved;
           if (!themes[merged.themeName]) merged.themeName = 'dark';
-          if (merged.lang !== 'sv' && merged.lang !== 'en') merged.lang = phoneLang();
+          if (merged.lang !== 'sv' && merged.lang !== 'en') merged.lang = 'en';
           if (![1, 2, 3].includes(merged.count)) merged.count = 2;
           if (!Array.isArray(merged.recent)) merged.recent = [];
           setS(merged);

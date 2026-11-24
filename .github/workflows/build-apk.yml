@@ -1,6 +1,6 @@
 name: Build APK
-# Bygger en signerad APK vid varje push till main som ändrar appen, och på begäran.
-# Hämta den från körningens sida: Actions -> körningen -> Artifacts.
+# Builds a signed APK on every push to main that changes the app, and on demand.
+# Download it from the run page: Actions -> the run -> Artifacts.
 on:
   push:
     branches: [main]

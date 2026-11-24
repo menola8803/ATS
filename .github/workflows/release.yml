@@ -1,7 +1,7 @@
 name: Release
-# En release görs för en tagg vX.Y.Z, och automatiskt när versionen i app/package.json ändras på main.
-# Releasen publiceras först NÄR APK:n är byggd och kontrollerad, med ATS-vX.Y.Z.apk och ATS.apk
-# (appens uppdateringsfunktion behöver APK:n).
+# A release is made for a tag vX.Y.Z, and automatically when the version in app/package.json changes on main.
+# The release is only published AFTER the APK has been built and checked, with ATS-vX.Y.Z.apk and ATS.apk
+# (the in-app updater needs the APK).
 on:
   push:
     tags: ['v*']
