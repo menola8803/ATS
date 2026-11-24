@@ -1,5 +1,8 @@
 # Nyheter i ATS
 
+## 0.1.4
+- Fältet för API-nyckeln säger tydligt vad som ska in: "Skriv in din API-nyckel för Claude (Anthropic) här".
+
 ## 0.1.3
 - API-nyckeln förklaras i appen: vad den är, vad den kostar och steg för steg hur du skaffar en. Guiden visas direkt under Inställningar › AI-förslag när ingen nyckel är sparad, och manualen har ett eget avsnitt.
 - Appen säger till om en inklistrad nyckel inte ser ut som en nyckel från Anthropic.

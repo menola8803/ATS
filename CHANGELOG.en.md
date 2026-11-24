@@ -1,5 +1,8 @@
 # What's new in ATS
 
+## 0.1.4
+- The API key field says clearly what goes in it: "Enter your Claude (Anthropic) API key here".
+
 ## 0.1.3
 - The API key is explained in the app: what it is, what it costs and, step by step, how to get one. The guide shows right away under Settings › AI suggestions when no key is saved, and the manual has its own section.
 - The app tells you when a pasted key does not look like a key from Anthropic.
