@@ -13,6 +13,11 @@ ok(guard(cvText, 'x', { text: 'Handled 12 tickets', why: '' }, 'en')!.text === '
 const advice = parseAdvice('Här:\n```json\n{"paragraphs":[{"id":2,"ok":false,"suggestions":[{"text":"A","why":"w"},{"text":"B"},{"text":"C"}]},{"id":9,"ok":true,"suggestions":[]},{"id":77,"ok":false,"suggestions":[{"text":"x"}]}]}\n```', [2, 9], 2);
 ok(advice.length === 2 && advice[0].suggestions.length === 2 && advice[1].ok, 'parse, limit and unknown ids dropped');
 ok(/HONESTY LOCK/.test(systemPrompt({ count: 2, tone: 'neutral', appLang: 'sv' })), 'the prompt has the honesty lock');
+
+// A cut-off answer (too long): the complete paragraphs are still read, the half-written one is dropped.
+const truncated = '{"paragraphs":[{"id":2,"ok":false,"suggestions":[{"text":"A","why":"w"}]},{"id":5,"ok":false,"suggestions":[{"text":"B","why":"wh';
+const salvaged = parseAdvice(truncated, [2, 5], 2);
+ok(salvaged.length === 1 && salvaged[0].id === 2 && salvaged[0].suggestions[0].text === 'A', 'truncated answer salvages whole paragraphs');
 ok(filledText('Ansvarade för [ANTAL] datorer i [STAD]', ['40']) === 'Ansvarade för 40 datorer i [STAD]', 'placeholders filled in order');
 
 // A whole request with a fake answer from the API

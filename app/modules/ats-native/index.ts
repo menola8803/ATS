@@ -8,8 +8,10 @@ type AtsNative = {
   saveDownload(name: string, base64: string, mime: string): Promise<SavedFile>;
   /** Creates Download/ATS with a short note in it (true when the folder is there). */
   makeFolder(note: string): Promise<boolean>;
-  /** The .docx and .odt files ATS has saved in Download/ATS, newest first. */
+  /** The .docx and .odt files in Download/ATS, newest first (also ones copied in over USB). */
   listDownloads(): Promise<DownloadFile[]>;
+  /** Asks Android to index Download/ATS so newly added files are found. */
+  rescan(): Promise<void>;
   /** Reads a file (content:// or file://) as Base64. */
   readBase64(uri: string): Promise<string>;
   markUpdatePending(title: string, body: string, channel: string): void;

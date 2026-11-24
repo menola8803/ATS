@@ -1,5 +1,9 @@
 # Nyheter i ATS
 
+## 0.1.5
+- CV som du lägger i Download/ATS från datorn eller via USB hittas nu automatiskt. Listan läses om när du öppnar appen eller går till Dokument, och appen letar på filändelse i stället för filtyp, så inget göms.
+- AI-förslagen är stabilare för långa CV: texten delas upp i mindre begäranden så svaret inte kapas, med tidsgräns och ett automatiskt omförsök om anslutningen tappas. Det åtgärdar "svaret kunde inte läsas" och "ingen anslutning".
+
 ## 0.1.4
 - Fältet för API-nyckeln säger tydligt vad som ska in: "Skriv in din API-nyckel för Claude (Anthropic) här".
 

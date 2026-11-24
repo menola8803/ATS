@@ -1,5 +1,9 @@
 # What's new in ATS
 
+## 0.1.5
+- A CV you put in Download/ATS from a computer or over USB is now found automatically. The list is read again when you open the app or go to Documents, and the app looks by file extension instead of file type, so nothing is hidden.
+- AI suggestions are steadier for long CVs: the text is split into smaller requests so the answer is not cut off, with a timeout and one automatic retry if the connection drops. This fixes "the answer could not be read" and "no connection".
+
 ## 0.1.4
 - The API key field says clearly what goes in it: "Enter your Claude (Anthropic) API key here".
 

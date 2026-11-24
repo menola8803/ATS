@@ -57,13 +57,47 @@ export function userPrompt(cv: Cv, ids: number[], ad?: string): string {
   ].join('\n');
 }
 
-/** Finds the JSON in the answer (tolerates code fences or text around it). */
+/** Pulls complete top-level {...} objects out of a string, even when it is cut off partway. */
+function salvageObjects(s: string): any[] {
+  const out: any[] = [];
+  let depth = 0, start = -1, inStr = false, esc = false;
+  for (let i = 0; i < s.length; i++) {
+    const ch = s[i];
+    if (inStr) {
+      if (esc) esc = false;
+      else if (ch === '\\') esc = true;
+      else if (ch === '"') inStr = false;
+      continue;
+    }
+    if (ch === '"') inStr = true;
+    else if (ch === '{') { if (depth === 0) start = i; depth++; }
+    else if (ch === '}') {
+      depth--;
+      if (depth === 0 && start >= 0) {
+        try { out.push(JSON.parse(s.slice(start, i + 1))); } catch {}
+        start = -1;
+      }
+    }
+  }
+  return out;
+}
+
+/** Finds the JSON in the answer (tolerates code fences, text around it, or a cut-off answer). */
 export function parseAdvice(text: string, ids: number[], count: number): ParaAdvice[] {
   const cleaned = text.replace(/```(?:json)?/gi, '').trim();
   const a = cleaned.indexOf('{'), b = cleaned.lastIndexOf('}');
-  if (a < 0 || b <= a) throw Object.assign(new Error('no JSON in answer'), { kind: 'answer' as ApiError });
-  const j = JSON.parse(cleaned.slice(a, b + 1));
-  const list: any[] = Array.isArray(j?.paragraphs) ? j.paragraphs : [];
+  if (a < 0) throw Object.assign(new Error('no JSON in answer'), { kind: 'answer' as ApiError });
+  let list: any[] = [];
+  try {
+    // Fast path: the whole answer is valid JSON.
+    const j = JSON.parse(cleaned.slice(a, b + 1));
+    list = Array.isArray(j?.paragraphs) ? j.paragraphs : [];
+  } catch {
+    // The answer was cut off (too long): keep every paragraph object that is complete.
+    const arr = cleaned.indexOf('[', cleaned.indexOf('paragraphs'));
+    list = salvageObjects(cleaned.slice(arr >= 0 ? arr : a)).filter(o => 'id' in (o ?? {}));
+  }
+  if (!list.length) throw Object.assign(new Error('no JSON in answer'), { kind: 'answer' as ApiError });
   const want = new Set(ids);
   const out: ParaAdvice[] = [];
   for (const p of list) {
@@ -90,19 +124,29 @@ export function guard(cvText: string, original: string, s: Suggestion, lang: 'sv
   return { text, why: s.why };
 }
 
-/** One call to the Messages API. */
-export async function askClaude(opts: { apiKey: string; model: string; system: string; user: string; maxTokens?: number; f?: typeof fetch; signal?: AbortSignal }): Promise<string> {
+/** One call to the Messages API. A slow request is cut off after timeoutMs so a dropped connection surfaces. */
+export async function askClaude(opts: { apiKey: string; model: string; system: string; user: string; maxTokens?: number; timeoutMs?: number; f?: typeof fetch; signal?: AbortSignal }): Promise<string> {
   if (!opts.apiKey) throw Object.assign(new Error('nokey'), { kind: 'nokey' as ApiError });
+  const ctrl = new AbortController();
+  let timedOut = false;
+  const timer = setTimeout(() => { timedOut = true; ctrl.abort(); }, opts.timeoutMs ?? 90000);
+  if (opts.signal) {
+    if (opts.signal.aborted) ctrl.abort();
+    else opts.signal.addEventListener('abort', () => ctrl.abort());
+  }
   let r: Response;
   try {
     r = await (opts.f ?? fetch)('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      signal: opts.signal,
+      signal: ctrl.signal,
       headers: { 'content-type': 'application/json', 'x-api-key': opts.apiKey, 'anthropic-version': '2023-06-01' },
-      body: JSON.stringify({ model: opts.model, max_tokens: opts.maxTokens ?? 8192, system: opts.system, messages: [{ role: 'user', content: opts.user }] }),
+      body: JSON.stringify({ model: opts.model, max_tokens: opts.maxTokens ?? 16000, system: opts.system, messages: [{ role: 'user', content: opts.user }] }),
     });
   } catch {
-    throw Object.assign(new Error('network'), { kind: 'network' as ApiError });
+    // A timeout counts as "busy, try again"; a real connection drop as "no connection".
+    throw Object.assign(new Error(timedOut ? 'busy' : 'network'), { kind: (timedOut ? 'busy' : 'network') as ApiError });
+  } finally {
+    clearTimeout(timer);
   }
   if (r.status === 401 || r.status === 403) throw Object.assign(new Error('badkey'), { kind: 'badkey' as ApiError });
   if (r.status === 429 || r.status === 529) throw Object.assign(new Error('busy'), { kind: 'busy' as ApiError });
@@ -113,22 +157,41 @@ export async function askClaude(opts: { apiKey: string; model: string; system: s
   return text;
 }
 
+/** Paragraphs are asked for in small groups, so each request is quick, fits the answer limit and is less likely to drop. */
+export const BATCH = 8;
+const chunk = <T,>(a: T[], n: number): T[][] => { const o: T[][] = []; for (let i = 0; i < a.length; i += n) o.push(a.slice(i, i + n)); return o; };
+
+/** Runs fn, and tries once more after a short pause if the connection dropped or the service was busy. */
+async function withRetry<T>(fn: () => Promise<T>): Promise<T> {
+  try { return await fn(); }
+  catch (e: any) {
+    if (e?.kind !== 'network' && e?.kind !== 'busy') throw e;
+    await new Promise(r => setTimeout(r, 900));
+    return await fn();
+  }
+}
+
 /** Suggestions for the given paragraphs of the CV. */
 export async function suggest(opts: {
   cv: Cv; ids: number[]; ad?: string; apiKey: string; model: ModelKey; count: number; tone: Tone; appLang: 'sv' | 'en'; f?: typeof fetch; signal?: AbortSignal;
 }): Promise<ParaAdvice[]> {
   if (!opts.ids.length) return [];
-  const answer = await askClaude({
-    apiKey: opts.apiKey, model: modelId(opts.model), f: opts.f, signal: opts.signal,
-    system: systemPrompt({ count: opts.count, tone: opts.tone, appLang: opts.appLang }),
-    user: userPrompt(opts.cv, opts.ids, opts.ad),
-  });
   const all = opts.cv.paras.map(p => p.text).join('\n');
-  return parseAdvice(answer, opts.ids, opts.count).map(a => {
-    const original = opts.cv.paras[a.id]?.text ?? '';
-    const suggestions = a.suggestions.map(s => guard(all, original, s, opts.appLang)).filter((s): s is Suggestion => !!s);
-    return { id: a.id, ok: a.ok || suggestions.length === 0, suggestions };
-  });
+  const byId = new Map(opts.cv.paras.map(p => [p.id, p.text]));
+  const system = systemPrompt({ count: opts.count, tone: opts.tone, appLang: opts.appLang });
+  const out: ParaAdvice[] = [];
+  for (const ids of chunk(opts.ids, BATCH)) {
+    const answer = await withRetry(() => askClaude({
+      apiKey: opts.apiKey, model: modelId(opts.model), f: opts.f, signal: opts.signal,
+      system, user: userPrompt(opts.cv, ids, opts.ad),
+    }));
+    for (const a of parseAdvice(answer, ids, opts.count)) {
+      const original = byId.get(a.id) ?? '';
+      const suggestions = a.suggestions.map(s => guard(all, original, s, opts.appLang)).filter((s): s is Suggestion => !!s);
+      out.push({ id: a.id, ok: a.ok || suggestions.length === 0, suggestions });
+    }
+  }
+  return out;
 }
 
 /** Checks that a key works with a tiny request. */

@@ -3,12 +3,15 @@ package se.sncab.atsnative
 import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
+import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.provider.MediaStore
 import android.util.Base64
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
+import java.io.File
 
 // Files and updates for ATS:
 //  - saveDownload / listDownloads: the documents ATS saves in Download/ATS (MediaStore, no storage permission needed)
@@ -17,6 +20,16 @@ import expo.modules.kotlin.modules.ModuleDefinition
 class AtsNativeModule : Module() {
   private val ctx: Context get() = appContext.reactContext ?: throw Exception("No context")
   private val folder = "Download/ATS"
+
+  // Tell the media scanner about the files in Download/ATS so newly added ones are indexed.
+  private fun rescan() {
+    try {
+      val dir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "ATS")
+      val files = dir.listFiles()?.mapNotNull { it.absolutePath }?.toTypedArray()
+      val paths = if (files != null && files.isNotEmpty()) files else arrayOf(dir.absolutePath)
+      MediaScannerConnection.scanFile(ctx, paths, null, null)
+    } catch (_: Exception) {}
+  }
 
   override fun definition() = ModuleDefinition {
     Name("AtsNative")
@@ -61,22 +74,32 @@ class AtsNativeModule : Module() {
       true
     }
 
+    // Ask Android to index Download/ATS, so a file copied in over USB or from a computer
+    // is registered in MediaStore and shows up in the list. Best effort; ignored on failure.
+    AsyncFunction("rescan") { rescan() }
+
     AsyncFunction("listDownloads") {
       val out = mutableListOf<Map<String, Any?>>()
       if (Build.VERSION.SDK_INT < 29) return@AsyncFunction out
-      val cols = arrayOf(MediaStore.Downloads._ID, MediaStore.Downloads.DISPLAY_NAME, MediaStore.Downloads.SIZE, MediaStore.Downloads.DATE_MODIFIED)
+      rescan()
+      // Query the general Files collection, not just Downloads: a file placed in the folder
+      // over USB is indexed there even when it does not appear under the Downloads view.
+      val collection = MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL)
+      val cols = arrayOf(MediaStore.MediaColumns._ID, MediaStore.MediaColumns.DISPLAY_NAME, MediaStore.MediaColumns.SIZE, MediaStore.MediaColumns.DATE_MODIFIED)
+      val seen = HashSet<String>()
       ctx.contentResolver.query(
-        MediaStore.Downloads.EXTERNAL_CONTENT_URI, cols,
-        "${MediaStore.Downloads.RELATIVE_PATH} LIKE ?", arrayOf("$folder/%"),
-        "${MediaStore.Downloads.DATE_MODIFIED} DESC"
+        collection, cols,
+        "${MediaStore.MediaColumns.RELATIVE_PATH} LIKE ?", arrayOf("$folder/%"),
+        "${MediaStore.MediaColumns.DATE_MODIFIED} DESC"
       )?.use { c ->
         while (c.moveToNext()) {
           val id = c.getLong(0)
           val name = c.getString(1) ?: continue
           val lower = name.lowercase()
           if (!lower.endsWith(".docx") && !lower.endsWith(".odt")) continue
+          if (!seen.add(name.lowercase())) continue
           out.add(mapOf(
-            "uri" to ContentUris.withAppendedId(MediaStore.Downloads.EXTERNAL_CONTENT_URI, id).toString(),
+            "uri" to ContentUris.withAppendedId(collection, id).toString(),
             "name" to name, "size" to c.getLong(2), "modified" to c.getLong(3) * 1000
           ))
         }

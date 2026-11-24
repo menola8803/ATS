@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { BackHandler, View } from 'react-native';
+import { AppState, BackHandler, View } from 'react-native';
 import { useFonts } from 'expo-font';
 import Constants from 'expo-constants';
 import * as DocumentPicker from 'expo-document-picker';
@@ -57,6 +57,12 @@ function Content() {
   }, [ready]);
   // The list is read again when Documents or Home is shown.
   useEffect(() => { if (tab === 'docs' || tab === 'home') setRefresh(n => n + 1); }, [tab]);
+  // Read the list again when ATS comes back to the foreground, so a document added over
+  // USB or from a computer while ATS was in the background shows up without a restart.
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', s => { if (s === 'active') setRefresh(n => n + 1); });
+    return () => sub.remove();
+  }, []);
 
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
