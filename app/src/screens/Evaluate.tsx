@@ -39,7 +39,7 @@ export default function Evaluate({ onPick, onDemo, onSave, onSettings }: { onPic
   const [mode, setMode] = useState<'orig' | 'new'>('new');
   const [details, setDetails] = useState(false);
   const kbd = useKeyboardOpen();
-  const scrollRef = useRef<ScrollView>(null);
+  const scrollRef = useRef<React.ElementRef<typeof ScrollView>>(null);
   const yById = useRef<Record<number, number>>({});
   const jumpTo = (id: number) => scrollRef.current?.scrollTo({ y: Math.max(0, (yById.current[id] ?? 0) - 10), animated: true });
   const d = s.doc;
