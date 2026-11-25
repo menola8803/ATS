@@ -11,10 +11,11 @@ export type DocItem = {
   key: string; name: string; kind: Kind; source: 'saved' | 'opened' | 'demo';
   uri?: string; path?: string; demo?: Demo;
   at: number; score: number | null; photo: boolean; meta: string; thumb?: Thumb;
+  draft?: { picked: number; total: number }; // unfinished work: suggestions chosen / with suggestions
 };
 
 export function useDocList(refresh: number) {
-  const { recent, scores, showDemo, lang, t } = useApp();
+  const { recent, scores, drafts, showDemo, lang, t } = useApp();
   const [saved, setSaved] = useState<DocItem[]>([]);
   const load = useCallback(async () => {
     const files = await listSaved();
@@ -25,7 +26,13 @@ export function useDocList(refresh: number) {
   }, []);
   useEffect(() => { load(); }, [load, refresh]);
 
-  const withScore = (d: DocItem): DocItem => ({ ...d, score: scores[d.key]?.score ?? null, thumb: scores[d.key]?.thumb ?? d.thumb });
+  const draftOf = (key: string) => {
+    const dr = drafts[key];
+    if (!dr) return undefined;
+    const total = Object.values(dr.advice).filter(a => a.suggestions.length).length;
+    return { picked: Object.keys(dr.picked).length, total };
+  };
+  const withScore = (d: DocItem): DocItem => ({ ...d, score: scores[d.key]?.score ?? null, thumb: scores[d.key]?.thumb ?? d.thumb, draft: draftOf(d.key) });
   const meta = (d: DocItem) => `${d.kind.toUpperCase()} · ${dateYear(new Date(d.at), lang)}`;
   const items: DocItem[] = [
     ...saved.map(d => ({ ...d, meta: `${meta(d)} · ${t.docSaved}` })),

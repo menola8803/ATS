@@ -1,10 +1,11 @@
 // The document that is open right now: its paragraphs, score, AI suggestions and the choices the person has made.
-import React, { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Cv, Kind, readCv, writeCv } from './core/cv';
 import { evaluate, candidates, Score } from './core/ats';
 import { ApiError, ParaAdvice, PLACEHOLDERS, suggest } from './core/ai';
 import { buildThumb, Thumb } from './core/thumb';
 import { convertClean } from './core/convert';
+import { cvToPdf } from './core/pdf';
 import { unzip, zip } from './core/zip';
 import { filledText as filled } from './core/fill';
 import { useApp } from './store';
@@ -35,7 +36,9 @@ type Ctx = {
   after: Score | null;                   // the score with the chosen suggestions
   build: () => Uint8Array;               // the improved file, in the original format
   buildAs: (kind: Kind) => Uint8Array;   // the improved file; a different format is rebuilt clean
+  pdf: () => Uint8Array;                 // the improved document as a clean PDF
   thumb: () => Thumb | undefined;        // a page miniature of the improved document
+  discard: () => void;                   // throw away the unfinished work and start over
 };
 const C = createContext<Ctx>(null as unknown as Ctx);
 export const useDoc = () => useContext(C);
@@ -54,11 +57,19 @@ export function DocProvider({ children }: { children: React.ReactNode }) {
     const cv = readCv(o.kind, unzip(bytes));
     const ad = o.demoAd ?? (app.useAd ? app.ad : '');
     const before = evaluate(cv, ad || undefined, app.region);
-    const d: OpenDoc = { key: o.key, name: o.name, kind: o.kind, demo: o.demo, cv, ad, adIsDemo: !!o.demoAd, before, advice: null, picked: {}, fills: {} };
+    // Carry on from unfinished work on this document, if there is any.
+    const draft = app.drafts[o.key];
+    const d: OpenDoc = { key: o.key, name: o.name, kind: o.kind, demo: o.demo, cv, ad, adIsDemo: !!o.demoAd, before,
+      advice: draft?.advice ?? null, picked: draft?.picked ?? {}, fills: draft?.fills ?? {} };
     setDoc(d); setError(null); setErrorText(''); setBusy(false);
     app.setScore(o.key, before.score, buildThumb(cv));
     return d;
   }, [app]);
+
+  // Keep the unfinished work saved, so the person can leave and carry on later. Cleared when they save the improved file.
+  useEffect(() => {
+    if (doc?.advice) app.setDraft(doc.key, { advice: doc.advice, picked: doc.picked, fills: doc.fills, at: Date.now() });
+  }, [doc]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const close = useCallback(() => { abort.current?.abort(); setDoc(null); setBusy(false); }, []);
 
@@ -145,8 +156,20 @@ export function DocProvider({ children }: { children: React.ReactNode }) {
     return buildThumb(cv);
   }, [doc, editsOf]);
 
+  const pdf = useCallback(() => {
+    if (!doc) throw new Error('no document');
+    return cvToPdf(doc.cv, editsOf(doc));
+  }, [doc, editsOf]);
+
+  // Throw away the unfinished work for this document and start from the original again.
+  const discard = useCallback(() => {
+    if (!doc) return;
+    app.clearDraft(doc.key);
+    setDoc(d => (d ? { ...d, advice: null, picked: {}, fills: {} } : d));
+  }, [doc, app]);
+
   const value = useMemo<Ctx>(() => ({
-    doc, busy, error, errorText, open, close, fetchAdvice, pick, unpick, setFill, useAllFirst, textOf, edits, unfilled, after, build, buildAs, thumb,
-  }), [doc, busy, error, errorText, open, close, fetchAdvice, pick, unpick, setFill, useAllFirst, textOf, edits, unfilled, after, build, buildAs, thumb]);
+    doc, busy, error, errorText, open, close, fetchAdvice, pick, unpick, setFill, useAllFirst, textOf, edits, unfilled, after, build, buildAs, pdf, thumb, discard,
+  }), [doc, busy, error, errorText, open, close, fetchAdvice, pick, unpick, setFill, useAllFirst, textOf, edits, unfilled, after, build, buildAs, pdf, thumb, discard]);
   return <C.Provider value={value}>{children}</C.Provider>;
 }

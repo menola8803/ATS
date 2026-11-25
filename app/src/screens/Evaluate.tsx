@@ -205,7 +205,12 @@ export default function Evaluate({ onPick, onDemo, onSave, onSettings }: { onPic
             </Card>
           );
         })}
-        {adv ? <SmallBtn title={s.busy ? t.analysing.replace('{n}', String(ids.size)) : t.newSuggestions} onPress={s.fetchAdvice} disabled={s.busy} /> : null}
+        {adv ? (
+          <View style={{ flexDirection: 'row', gap: 10 }}>
+            <View style={{ flex: 1 }}><SmallBtn title={s.busy ? t.analysing.replace('{n}', String(ids.size)) : t.newSuggestions} onPress={s.fetchAdvice} disabled={s.busy} /></View>
+            <View style={{ flex: 1 }}><SmallBtn title={t.startOver} onPress={() => showDialog(t.startOverTitle, t.startOverBody, [{ text: t.cancel, style: 'cancel' }, { text: t.startOverYes, style: 'destructive', onPress: s.discard }])} /></View>
+          </View>
+        ) : null}
       </ScrollView>
       {adv && !kbd ? (
         <View style={{ position: 'absolute', left: 0, right: 0, bottom: insets.bottom + 84, flexDirection: 'row', gap: 10, paddingVertical: 8, backgroundColor: theme.bg }}>

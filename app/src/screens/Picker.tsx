@@ -30,7 +30,9 @@ export default function Picker({ items, onOpen, onBrowse, onBack }: { items: Doc
             <View style={{ flex: 1, gap: 3 }}>
               <Text numberOfLines={1} style={{ fontSize: 15, fontWeight: '700', color: theme.ink }}>{d.name}</Text>
               <Text style={{ fontSize: 12, color: theme.muted }}>{d.meta}</Text>
-              {isImproved(d.name) ? <View style={{ alignSelf: 'flex-start' }}><Tag text={t.improvedBy} color={theme.dark ? '#F3D9A0' : theme.accent} fill={theme.dark ? 'rgba(232,176,74,0.12)' : theme.chip} /></View> : null}
+              {d.draft && d.draft.picked > 0
+                ? <View style={{ alignSelf: 'flex-start' }}><Tag text={`${t.inProgress} · ${fill(t.progressChosen, { n: d.draft.picked, m: d.draft.total })}`} color="#0F1A1C" fill="#E8B04A" /></View>
+                : isImproved(d.name) ? <View style={{ alignSelf: 'flex-start' }}><Tag text={t.improvedBy} color={theme.dark ? '#F3D9A0' : theme.accent} fill={theme.dark ? 'rgba(232,176,74,0.12)' : theme.chip} /></View> : null}
             </View>
             {d.score !== null ? <ScoreRing score={d.score} size={44} /> : <NotTested />}
           </Pressable>

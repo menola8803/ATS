@@ -87,6 +87,11 @@ export async function openOutside(uri: string, kind: Kind) {
   await IntentLauncher.startActivityAsync('android.intent.action.VIEW', { data: uri, flags: 1, type: MIME[kind] });
 }
 
+/** Opens any saved file in another app by its MIME type (e.g. a PDF). */
+export async function openOutsideMime(uri: string, mime: string) {
+  await IntentLauncher.startActivityAsync('android.intent.action.VIEW', { data: uri, flags: 1, type: mime });
+}
+
 /** A file name without characters Android does not accept. */
 export const cleanName = (s: string) => s.replace(/[\\/:*?"<>|\n\r\t]+/g, '_').trim();
 export const baseName = (name: string) => name.replace(/\.(docx|odt)$/i, '');

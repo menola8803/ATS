@@ -33,7 +33,7 @@
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
-    "test": "tsx test/docx.test.ts && tsx test/odt.test.ts && tsx test/ats.test.ts && tsx test/convert.test.ts && tsx test/ai.test.ts && tsx test/manual.test.ts && tsx test/update.test.ts",
+    "test": "tsx test/docx.test.ts && tsx test/odt.test.ts && tsx test/ats.test.ts && tsx test/convert.test.ts && tsx test/pdf.test.ts && tsx test/ai.test.ts && tsx test/manual.test.ts && tsx test/update.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "private": true

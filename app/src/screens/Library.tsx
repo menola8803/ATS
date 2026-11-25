@@ -8,13 +8,19 @@ import { DocItem } from '../library';
 
 /** A document as a card: a page miniature with the score (or "Not tested") in the corner, the name and a line under it. */
 export function DocCard({ d, width, onPress }: { d: DocItem; width?: number; onPress: () => void }) {
-  const { theme } = useApp();
+  const { theme, t } = useApp();
+  const inProgress = !!d.draft && d.draft.picked > 0;
   return (
     <Pressable accessibilityRole="button" accessibilityLabel={`${d.name}, ${d.score !== null ? d.score : ''}`} onPress={onPress}
-      style={({ pressed }) => ({ width, flex: width ? undefined : 1, padding: 8, borderRadius: 16, backgroundColor: theme.card, borderWidth: 1, borderColor: theme.line, opacity: pressed ? 0.85 : 1 })}>
+      style={({ pressed }) => ({ width, flex: width ? undefined : 1, padding: 8, borderRadius: 16, backgroundColor: theme.card, borderWidth: 1, borderColor: inProgress ? 'rgba(232,176,74,0.5)' : theme.line, opacity: pressed ? 0.85 : 1 })}>
       <View>
         {d.thumb ? <CvThumb thumb={d.thumb} /> : <Paper photo={d.photo} />}
         <View style={{ position: 'absolute', top: 6, right: 6 }}>{d.score !== null ? <ScoreRing score={d.score} /> : <NotTested />}</View>
+        {inProgress ? (
+          <View style={{ position: 'absolute', left: 6, top: 6, flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 9, backgroundColor: '#E8B04A' }}>
+            <Text style={{ fontSize: 10.5, fontWeight: '700', color: '#0F1A1C' }}>{t.inProgress}</Text>
+          </View>
+        ) : null}
         {d.source === 'demo' ? (
           <View style={{ position: 'absolute', left: 6, bottom: 6, paddingHorizontal: 7, paddingVertical: 2, borderRadius: 8, borderWidth: 1, borderColor: theme.good, backgroundColor: theme.dark ? 'rgba(15,26,28,0.9)' : 'rgba(250,248,244,0.95)' }}>
             <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 1, color: theme.good }}>DEMO</Text>
@@ -22,7 +28,9 @@ export function DocCard({ d, width, onPress }: { d: DocItem; width?: number; onP
         ) : null}
       </View>
       <Text numberOfLines={1} style={{ marginTop: 6, fontSize: 13.5, fontWeight: '700', color: theme.ink }}>{d.name}</Text>
-      <Text numberOfLines={1} style={{ fontSize: 11.5, color: theme.muted }}>{d.meta}</Text>
+      {inProgress
+        ? <Text numberOfLines={1} style={{ fontSize: 11.5, fontWeight: '600', color: theme.dark ? '#E8B04A' : theme.accent }}>{fill(t.progressChosen, { n: d.draft!.picked, m: d.draft!.total })}</Text>
+        : <Text numberOfLines={1} style={{ fontSize: 11.5, color: theme.muted }}>{d.meta}</Text>}
     </Pressable>
   );
 }

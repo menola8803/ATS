@@ -131,6 +131,11 @@ const sv = {
 
   // save: format choice
   formatSameShort: 'behåller layouten', formatConvertNote: 'Det andra formatet byggs om som ett rent, ATS-säkert dokument. Tabeller och rutor blir stycken, bilder tas bort.',
+  formatPdfNote: 'PDF byggs som ett rent dokument med markerbar text som ATS kan läsa. Den kan inte läsas tillbaka in i appen – spara även .docx eller .odt om du vill kunna utvärdera igen.',
+
+  // drafts: continue where you left off
+  inProgress: 'Pågår', progressChosen: '{n} av {m} förslag valda', draftDone: 'Klar',
+  startOver: 'Börja om', startOverTitle: 'Börja om?', startOverBody: 'Dina valda förslag och ifyllnader för det här CV:t tas bort. CV:t ändras inte.', startOverYes: 'Börja om',
 
   // settings: region
   regionSection: 'Region', regionLabel: 'Var söker du jobb?', regionNote: 'Olika länder vill se olika saker i ett CV. Valet styr hur poängen räknas.',
@@ -291,6 +296,10 @@ const en: Strings = {
   chkAvailabilityOk: 'Availability stated', chkAvailabilityBad: 'No availability – recommended in the Gulf',
 
   formatSameShort: 'keeps the layout', formatConvertNote: 'The other format is rebuilt as a clean, ATS-safe document. Tables and boxes become paragraphs, images are dropped.',
+  formatPdfNote: 'PDF is built as a clean document with selectable text an ATS can read. It cannot be read back into the app – also save .docx or .odt if you want to evaluate again.',
+
+  inProgress: 'In progress', progressChosen: '{n} of {m} suggestions chosen', draftDone: 'Done',
+  startOver: 'Start over', startOverTitle: 'Start over?', startOverBody: 'Your chosen suggestions and fills for this CV are removed. The CV itself is not changed.', startOverYes: 'Start over',
 
   regionSection: 'Region', regionLabel: 'Where are you applying?', regionNote: 'Different countries expect different things in a CV. The choice steers how the score is counted.',
   regionEu: 'Sweden / Europe', regionEuSub: 'No photo, no personal details, 1–2 pages',
