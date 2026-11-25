@@ -4,6 +4,7 @@ import Constants from 'expo-constants';
 import { useApp } from '../store';
 import { Body, Btn, Card, Choice, Header, Label, Row, Screen, Segmented, SmallBtn, Text, TextInput, ThemePreview, Toggle, useButtonLook } from '../ui';
 import { themes, ThemeName } from '../theme';
+import { fill } from '../i18n';
 import { MANUAL } from '../manual';
 import { testKey, ModelKey, Tone } from '../core/ai';
 import { dateYear } from '../dates';
