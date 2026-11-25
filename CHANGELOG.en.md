@@ -1,5 +1,10 @@
 # What's new in ATS
 
+## 0.1.7
+- Continue where you left off: if you start improving a CV but do not finish, the work is saved automatically. The card shows "In progress" and how many suggestions you chose, and when you open the document again your choices and fills come back without fetching the AI suggestions again.
+- A Start over button in the evaluation view clears the draft and begins from the original.
+- Save as PDF: a clean document with selectable text an ATS can read. (A PDF cannot be read back into the app.)
+
 ## 0.1.6
 - Document cards now show a real miniature built from the document's own paragraphs: the name, headings and tables show, so every CV looks different.
 - New region choice under Settings. Pick Sweden/Europe or the Gulf states. In Gulf mode a photo costs no points, personal details (nationality, visa/Iqama/QID, availability) are checked, longer CVs are accepted and Arabic headings are recognised.

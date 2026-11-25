@@ -1,5 +1,10 @@
 # Nyheter i ATS
 
+## 0.1.7
+- Fortsätt där du var: börjar du förbättra ett CV men blir inte klar sparas arbetet automatiskt. Kortet visar "Pågår" och hur många förslag du valt, och när du öppnar dokumentet igen kommer dina val och ifyllnader tillbaka utan att AI-förslagen hämtas på nytt.
+- Börja om-knapp i utvärderingsvyn som rensar utkastet och börjar från originalet.
+- Spara som PDF: ett rent dokument med markerbar text som ATS kan läsa. (PDF kan inte läsas tillbaka in i appen.)
+
 ## 0.1.6
 - Dokumentkorten visar nu en riktig miniatyr byggd av dokumentets egna stycken: namn, rubriker och tabeller syns, så varje CV ser olika ut.
 - Nytt regionval under Inställningar. Välj Sverige/Europa eller Gulfstaterna. I Gulf-läget dras inga poäng för foto, personuppgifter (nationalitet, visum/Iqama/QID, tillgänglighet) kontrolleras, längre CV godkänns och arabiska rubriker känns igen.

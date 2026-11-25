@@ -1,6 +1,6 @@
 // The manual inside the app (Settings › Manual), in both languages. Update it for every change a user can see, and set
 // the version to the app's version (the tests check that).
-export const MANUAL_VERSION = '0.1.6';
+export const MANUAL_VERSION = '0.1.7';
 
 export type ManualSection = { title: string; items: string[] };
 
@@ -43,8 +43,14 @@ const sv: ManualSection[] = [
   { title: 'Spara och jämföra', items: [
     'Tryck på Spara nytt, välj filnamn och format och tryck Spara. Det förbättrade CV:t sparas som en ny fil.',
     'Samma format behåller originalets layout. Väljer du det andra formatet byggs ett rent, ATS-säkert dokument – tabeller och rutor blir stycken och bilder tas bort.',
+    'Du kan också spara som PDF med markerbar text. PDF kan inte läsas tillbaka in i appen, så spara även .docx eller .odt om du vill kunna utvärdera igen.',
     'Allt sparas i mappen Download/ATS, så du når filerna från Filer på telefonen eller från datorn. Originalet ändras aldrig.',
     'Se då och nu visar hela dokumentet före och efter. Markera ändrade stycken lyfter fram allt som AI:n har skrivit om.',
+  ] },
+  { title: 'Fortsätt där du var', items: [
+    'Börjar du förbättra ett CV men hinner inte bli klar sparas ditt arbete automatiskt. Kortet visar Pågår och hur många förslag du valt.',
+    'Öppnar du dokumentet igen kommer dina val och ifyllnader tillbaka, och AI-förslagen hämtas inte på nytt.',
+    'Börja om i utvärderingsvyn rensar utkastet och börjar från originalet. Markeringen försvinner när du sparat det förbättrade CV:t.',
   ] },
   { title: 'Region', items: [
     'Under Inställningar › Region väljer du var du söker jobb: Sverige/Europa eller Gulfstaterna.',
@@ -116,8 +122,14 @@ const en: ManualSection[] = [
   { title: 'Saving and comparing', items: [
     'Tap Save new, choose a file name and format and tap Save. The improved CV is saved as a new file.',
     'The same format keeps the original layout. If you choose the other format, a clean, ATS-safe document is built – tables and boxes become paragraphs and images are dropped.',
+    'You can also save as a PDF with selectable text. A PDF cannot be read back into the app, so also save .docx or .odt if you want to evaluate again.',
     'Everything is saved in the Download/ATS folder, so you can reach the files from Files on the phone or from a computer. The original is never changed.',
     'See before and after shows the whole document before and after. Highlight changed paragraphs marks everything the AI rewrote.',
+  ] },
+  { title: 'Continue where you left off', items: [
+    'If you start improving a CV but do not finish, your work is saved automatically. The card shows In progress and how many suggestions you chose.',
+    'When you open the document again your choices and fills come back, and the AI suggestions are not fetched again.',
+    'Start over in the evaluation view clears the draft and begins from the original. The badge disappears once you save the improved CV.',
   ] },
   { title: 'Region', items: [
     'Under Settings › Region you choose where you are applying: Sweden/Europe or the Gulf states.',
