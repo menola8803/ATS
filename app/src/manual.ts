@@ -1,6 +1,6 @@
 // The manual inside the app (Settings › Manual), in both languages. Update it for every change a user can see, and set
 // the version to the app's version (the tests check that).
-export const MANUAL_VERSION = '0.1.5';
+export const MANUAL_VERSION = '0.1.6';
 
 export type ManualSection = { title: string; items: string[] };
 

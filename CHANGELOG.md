@@ -1,5 +1,15 @@
 # Nyheter i ATS
 
+## 0.1.6
+- Dokumentkorten visar nu en riktig miniatyr byggd av dokumentets egna stycken: namn, rubriker och tabeller syns, så varje CV ser olika ut.
+- Nytt regionval under Inställningar. Välj Sverige/Europa eller Gulfstaterna. I Gulf-läget dras inga poäng för foto, personuppgifter (nationalitet, visum/Iqama/QID, tillgänglighet) kontrolleras, längre CV godkänns och arabiska rubriker känns igen.
+- När du sparar kan du välja .docx eller .odt. Samma format behåller layouten, det andra bygger ett rent, ATS-säkert dokument.
+- Inställningarna nås nu via kugghjulet i hörnet på varje flik. Menyn har tre flikar: Hem, Utvärdera och Dokument.
+- Ny filväljare i appen som listar dina CV i Download/ATS, nyast först, med flikar för Alla, Original och Förbättrade. "Bläddra på telefonen" öppnar systemets väljare.
+- Avinstallationsguide under Inställningar: säkerhetskopiera inställningar och poäng, behåll eller ta bort mappen, och återställ från en backup.
+- Skydd: appen startar bara om den är signerad med utvecklarens nyckel, och koden är skyddad med R8.
+- Tangentbordet täcker inte längre fältet du skriver i, och en förhandsvisning visar hur stycket blir.
+
 ## 0.1.5
 - CV som du lägger i Download/ATS från datorn eller via USB hittas nu automatiskt. Listan läses om när du öppnar appen eller går till Dokument, och appen letar på filändelse i stället för filtyp, så inget göms.
 - AI-förslagen är stabilare för långa CV: texten delas upp i mindre begäranden så svaret inte kapas, med tidsgräns och ett automatiskt omförsök om anslutningen tappas. Det åtgärdar "svaret kunde inte läsas" och "ingen anslutning".

@@ -1,5 +1,15 @@
 # What's new in ATS
 
+## 0.1.6
+- Document cards now show a real miniature built from the document's own paragraphs: the name, headings and tables show, so every CV looks different.
+- New region choice under Settings. Pick Sweden/Europe or the Gulf states. In Gulf mode a photo costs no points, personal details (nationality, visa/Iqama/QID, availability) are checked, longer CVs are accepted and Arabic headings are recognised.
+- When you save you can choose .docx or .odt. The same format keeps the layout; the other builds a clean, ATS-safe document.
+- Settings now open from the gear in the corner on every tab. The menu has three tabs: Home, Evaluate and Documents.
+- A new in-app picker lists your CVs in Download/ATS, newest first, with tabs for All, Original and Improved. "Browse the phone" opens the system picker.
+- Uninstall guide under Settings: back up settings and scores, keep or delete the folder, and restore from a backup.
+- Protection: the app starts only if it is signed with the developer's key, and the code is protected with R8.
+- The keyboard no longer covers the field you are typing in, and a preview shows how the paragraph will read.
+
 ## 0.1.5
 - A CV you put in Download/ATS from a computer or over USB is now found automatically. The list is read again when you open the app or go to Documents, and the app looks by file extension instead of file type, so nothing is hidden.
 - AI suggestions are steadier for long CVs: the text is split into smaller requests so the answer is not cut off, with a timeout and one automatic retry if the connection drops. This fixes "the answer could not be read" and "no connection".
