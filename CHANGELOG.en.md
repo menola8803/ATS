@@ -1,5 +1,9 @@
 # What's new in ATS
 
+## 0.1.8
+- A new side list when you evaluate: one dot per paragraph that can be improved, coloured by state (not chosen, chosen, already ATS-friendly). Tap to jump straight to the paragraph – handy in long CVs.
+- Clearer when the score is already 100: a note explains that the structure score has a ceiling and the suggestions sharpen the wording instead, with a tip to add a job ad for a keyword score.
+
 ## 0.1.7
 - Continue where you left off: if you start improving a CV but do not finish, the work is saved automatically. The card shows "In progress" and how many suggestions you chose, and when you open the document again your choices and fills come back without fetching the AI suggestions again.
 - A Start over button in the evaluation view clears the draft and begins from the original.

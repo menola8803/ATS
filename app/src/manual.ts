@@ -1,6 +1,6 @@
 // The manual inside the app (Settings › Manual), in both languages. Update it for every change a user can see, and set
 // the version to the app's version (the tests check that).
-export const MANUAL_VERSION = '0.1.7';
+export const MANUAL_VERSION = '0.1.8';
 
 export type ManualSection = { title: string; items: string[] };
 
@@ -16,6 +16,14 @@ const sv: ManualSection[] = [
     'Rubriker: att Profil, Erfarenhet, Utbildning och Kompetenser finns. Kontakt: e-post, telefon och gärna LinkedIn i själva texten.',
     'Längd: ungefär 300–900 ord är lagom.',
     'Med en jobbannons räknas också hur många av annonsens viktiga ord som finns i CV:t, och de som saknas visas.',
+  ] },
+  { title: 'Hoppa mellan styckena', items: [
+    'När förslagen är hämtade visas en liten lista med prickar på högerkanten – en per stycke som kan förbättras. Tryck på en prick för att hoppa direkt till det stycket.',
+    'Färgen visar läget: grå = inte vald än, guld = vald, grön = redan ATS-vänlig.',
+  ] },
+  { title: 'När poängen redan är 100', items: [
+    'Poängen mäter struktur och nyckelord, och 100 är taket. Har ditt CV redan perfekt struktur står siffran still även när AI:n förbättrar texten – ändringarna gör språket vassare för rekryteraren.',
+    'Lägg in en jobbannons så räknas halva poängen på hur väl CV:t matchar annonsens ord, och då kan textändringarna synas i siffran.',
   ] },
   { title: 'AI-förslag', items: [
     'Tryck på Få AI-förslag. Claude läser hela CV:t och ger ett till tre förslag för varje stycke som kan bli bättre.',
@@ -95,6 +103,14 @@ const en: ManualSection[] = [
     'Headings: that Profile, Experience, Education and Skills are present. Contact: email, phone and ideally LinkedIn in the body text.',
     'Length: about 300–900 words is right.',
     'With a job ad, the score also counts how many of the ad’s important words are in the CV, and the missing ones are shown.',
+  ] },
+  { title: 'Jump between paragraphs', items: [
+    'Once the suggestions are fetched, a small list of dots appears on the right edge – one per paragraph that can be improved. Tap a dot to jump straight to that paragraph.',
+    'The colour shows the state: grey = not chosen yet, gold = chosen, green = already ATS-friendly.',
+  ] },
+  { title: 'When the score is already 100', items: [
+    'The score measures structure and keywords, and 100 is the ceiling. If your CV already has perfect structure the number stays put even as the AI improves the text – the changes sharpen the wording for the recruiter.',
+    'Add a job ad and half the score counts how well the CV matches the ad’s words, so the text changes can then show in the number.',
   ] },
   { title: 'AI suggestions', items: [
     'Tap Get AI suggestions. Claude reads the whole CV and gives one to three suggestions for every paragraph that can be improved.',
