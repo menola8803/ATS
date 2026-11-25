@@ -1,5 +1,5 @@
 import React from 'react';
-import { Keyboard, Pressable, StyleSheet, Text as RNText, TextInput as RNTextInput, TextInputProps, TextProps, TextStyle, View, ViewStyle } from 'react-native';
+import { Keyboard, LayoutChangeEvent, Pressable, StyleSheet, Text as RNText, TextInput as RNTextInput, TextInputProps, TextProps, TextStyle, View, ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
 import { useApp } from './store';
@@ -53,9 +53,9 @@ export function Body({ children, muted, style }: { children: React.ReactNode; mu
   return <Text selectable style={[{ fontSize: 15, lineHeight: 22, color: muted ? theme.muted : theme.ink }, style]}>{children}</Text>;
 }
 
-export function Card({ children, style }: { children: React.ReactNode; style?: ViewStyle }) {
+export function Card({ children, style, onLayout }: { children: React.ReactNode; style?: ViewStyle; onLayout?: (e: LayoutChangeEvent) => void }) {
   const { theme } = useApp();
-  return <View style={[{ backgroundColor: theme.card, borderColor: theme.line, borderWidth: 1, borderRadius: 22, padding: 16, gap: 12 }, style]}>{children}</View>;
+  return <View onLayout={onLayout} style={[{ backgroundColor: theme.card, borderColor: theme.line, borderWidth: 1, borderRadius: 22, padding: 16, gap: 12 }, style]}>{children}</View>;
 }
 
 /** One look for every button, like the menu at the bottom: a gold tint, a thin gold border and gold text. */

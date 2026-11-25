@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -39,6 +39,9 @@ export default function Evaluate({ onPick, onDemo, onSave, onSettings }: { onPic
   const [mode, setMode] = useState<'orig' | 'new'>('new');
   const [details, setDetails] = useState(false);
   const kbd = useKeyboardOpen();
+  const scrollRef = useRef<ScrollView>(null);
+  const yById = useRef<Record<number, number>>({});
+  const jumpTo = (id: number) => scrollRef.current?.scrollTo({ y: Math.max(0, (yById.current[id] ?? 0) - 10), animated: true });
   const d = s.doc;
 
   if (!d) {
@@ -77,9 +80,18 @@ export default function Evaluate({ onPick, onDemo, onSave, onSettings }: { onPic
     onSave();
   };
 
+  // The paragraphs that have a suggestion card, for the side list that jumps between them.
+  const navParas = adv ? d.cv.paras.filter(p => p.text.trim() && ids.has(p.id) && adv[p.id]) : [];
+  const dotColor = (id: number) => {
+    const a = adv?.[id];
+    if (a && !a.suggestions.length) return theme.good;            // already ATS-friendly
+    if (d.picked[id] !== undefined) return hasPlaceholder(s.textOf(id)) ? (theme.dark ? '#F3D9A0' : theme.accent) : theme.primary; // chosen (needs fill / done)
+    return theme.dark ? 'rgba(183,198,195,0.35)' : theme.line;    // still open
+  };
+
   return (
     <View style={{ flex: 1 }}>
-      <ScrollView contentContainerStyle={{ gap: 12, paddingBottom: TAB_SPACE + insets.bottom + (adv ? 84 : 12) }} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+      <ScrollView ref={scrollRef} contentContainerStyle={{ gap: 12, paddingBottom: TAB_SPACE + insets.bottom + (adv ? 84 : 12) }} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
           <View style={{ flex: 1 }}>
             <H1 size={20}>{d.name}</H1>
@@ -124,6 +136,14 @@ export default function Evaluate({ onPick, onDemo, onSave, onSettings }: { onPic
           <Text style={{ flex: 1, fontSize: 12.5, lineHeight: 17, color: theme.muted }}>{t.lockOn}</Text>
         </View>
 
+        {adv && d.before.score >= 95 ? (
+          <View style={{ gap: 6, padding: 12, borderRadius: 16, backgroundColor: theme.dark ? 'rgba(232,176,74,0.08)' : theme.chip, borderWidth: 1, borderColor: theme.dark ? 'rgba(232,176,74,0.3)' : theme.line }}>
+            <Text style={{ fontSize: 13.5, fontWeight: '700', color: theme.ink }}>{t.scoreMaxTitle}</Text>
+            <Text style={{ fontSize: 13, lineHeight: 19, color: theme.muted }}>{t.scoreMaxBody}</Text>
+            {!kw ? <Text style={{ fontSize: 13, lineHeight: 19, color: theme.muted }}>{t.scoreMaxAd}</Text> : null}
+          </View>
+        ) : null}
+
         {!adv ? (
           <Card style={{ gap: 10 }}>
             {!apiKey ? (
@@ -165,7 +185,7 @@ export default function Evaluate({ onPick, onDemo, onSave, onSettings }: { onPic
             : <Tag text={t.canImprove} color={look.fg} fill={theme.dark ? 'rgba(232,176,74,0.14)' : theme.chip} />;
           const placeholders = picked ? (a.suggestions[sel].text.match(PLACEHOLDERS) ?? []) : [];
           return (
-            <Card key={p.id} style={{ gap: 10 }}>
+            <Card key={p.id} onLayout={e => { yById.current[p.id] = e.nativeEvent.layout.y; }} style={{ gap: 10 }}>
               <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>{badge}</View>
               <WithPlaceholders text={mode === 'orig' ? p.text : now} />
               {mode === 'new' && !good ? (
@@ -212,6 +232,19 @@ export default function Evaluate({ onPick, onDemo, onSave, onSettings }: { onPic
           </View>
         ) : null}
       </ScrollView>
+      {/* Side list: a dot per paragraph with a suggestion card. Tap to jump straight to it. */}
+      {adv && mode === 'new' && navParas.length > 3 && !kbd ? (
+        <View pointerEvents="box-none" style={{ position: 'absolute', right: 4, top: 96, bottom: insets.bottom + 150, justifyContent: 'center' }}>
+          <View style={{ alignSelf: 'flex-end', paddingVertical: 8, paddingHorizontal: 5, borderRadius: 14, backgroundColor: theme.dark ? 'rgba(19,34,37,0.82)' : 'rgba(250,248,244,0.9)', borderWidth: 1, borderColor: theme.dark ? 'rgba(232,176,74,0.22)' : theme.line, gap: 4 }}>
+            {navParas.map(p => (
+              <Pressable key={p.id} accessibilityRole="button" accessibilityLabel={p.text.trim().slice(0, 40)} onPress={() => jumpTo(p.id)} hitSlop={6}
+                style={{ width: 16, height: 10, alignItems: 'center', justifyContent: 'center' }}>
+                <View style={{ width: 14, height: 4, borderRadius: 2, backgroundColor: dotColor(p.id) }} />
+              </Pressable>
+            ))}
+          </View>
+        </View>
+      ) : null}
       {adv && !kbd ? (
         <View style={{ position: 'absolute', left: 0, right: 0, bottom: insets.bottom + 84, flexDirection: 'row', gap: 10, paddingVertical: 8, backgroundColor: theme.bg }}>
           <View style={{ flex: 1 }}><Btn kind="secondary" title={t.useAllFirst} onPress={s.useAllFirst} /></View>

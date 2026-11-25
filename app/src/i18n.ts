@@ -137,6 +137,11 @@ const sv = {
   inProgress: 'Pågår', progressChosen: '{n} av {m} förslag valda', draftDone: 'Klar',
   startOver: 'Börja om', startOverTitle: 'Börja om?', startOverBody: 'Dina valda förslag och ifyllnader för det här CV:t tas bort. CV:t ändras inte.', startOverYes: 'Börja om',
 
+  // already-perfect feedback
+  scoreMaxTitle: 'Strukturen är redan på topp',
+  scoreMaxBody: 'Poängen mäter struktur och nyckelord, och mer än 100 går inte. Förslagen gör texten vassare för rekryteraren som läser, även om siffran står still.',
+  scoreMaxAd: 'Lägg in en jobbannons på hemskärmen, så räknas halva poängen på hur väl ditt CV matchar annonsens ord – då kan textändringarna synas i siffran.',
+
   // settings: region
   regionSection: 'Region', regionLabel: 'Var söker du jobb?', regionNote: 'Olika länder vill se olika saker i ett CV. Valet styr hur poängen räknas.',
   regionEu: 'Sverige / Europa', regionEuSub: 'Inget foto, inga personuppgifter, 1–2 sidor',
@@ -300,6 +305,10 @@ const en: Strings = {
 
   inProgress: 'In progress', progressChosen: '{n} of {m} suggestions chosen', draftDone: 'Done',
   startOver: 'Start over', startOverTitle: 'Start over?', startOverBody: 'Your chosen suggestions and fills for this CV are removed. The CV itself is not changed.', startOverYes: 'Start over',
+
+  scoreMaxTitle: 'The structure is already at the top',
+  scoreMaxBody: 'The score measures structure and keywords, and 100 is the ceiling. The suggestions sharpen the wording for the recruiter who reads it, even though the number stays put.',
+  scoreMaxAd: 'Add a job ad on the home screen, and half the score counts how well your CV matches the ad’s words – then the text changes can show in the number.',
 
   regionSection: 'Region', regionLabel: 'Where are you applying?', regionNote: 'Different countries expect different things in a CV. The choice steers how the score is counted.',
   regionEu: 'Sweden / Europe', regionEuSub: 'No photo, no personal details, 1–2 pages',
