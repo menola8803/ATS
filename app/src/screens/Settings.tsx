@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Linking, Pressable, ScrollView, View } from 'react-native';
 import Constants from 'expo-constants';
 import { useApp } from '../store';
-import { Body, Btn, Card, H1, Header, Label, Row, Screen, Segmented, SmallBtn, TAB_SPACE, Text, TextInput, ThemePreview, Toggle, useButtonLook } from '../ui';
+import { Body, Btn, Card, Choice, Header, Label, Row, Screen, Segmented, SmallBtn, Text, TextInput, ThemePreview, Toggle, useButtonLook } from '../ui';
 import { themes, ThemeName } from '../theme';
 import { MANUAL } from '../manual';
 import { testKey, ModelKey, Tone } from '../core/ai';
@@ -25,7 +25,7 @@ function Switch({ title, sub, on, onChange }: { title: string; sub?: string; on:
   );
 }
 
-export default function Settings({ go, glow }: { go: (r: 'manual' | 'privacy' | 'update') => void; glow: boolean }) {
+export default function Settings({ onBack, go, glow }: { onBack: () => void; go: (r: 'manual' | 'privacy' | 'update' | 'uninstall') => void; glow: boolean }) {
   const app = useApp();
   const { theme, t } = app;
   const look = useButtonLook();
@@ -44,8 +44,9 @@ export default function Settings({ go, glow }: { go: (r: 'manual' | 'privacy' | 
   };
 
   return (
-    <ScrollView contentContainerStyle={{ gap: 14, paddingBottom: TAB_SPACE + 12 }} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-      <H1>{t.settings}</H1>
+    <Screen>
+      <Header title={t.settings} onBack={onBack} />
+      <ScrollView contentContainerStyle={{ gap: 14, paddingBottom: 24 }} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
 
       <Card>
         <Label>{t.appearance}</Label>
@@ -68,6 +69,25 @@ export default function Settings({ go, glow }: { go: (r: 'manual' | 'privacy' | 
         <Label>{t.language}</Label>
         <Segmented<'en' | 'sv'> value={app.lang} onChange={v => app.setPrefs({ lang: v })} options={[['en', 'English'], ['sv', 'Svenska']]} />
         <Text style={{ fontSize: 12.5, color: theme.muted }}>{t.langNote}</Text>
+      </Card>
+
+      <Card>
+        <Label>{t.regionSection}</Label>
+        <Text style={{ fontSize: 13, lineHeight: 18, color: theme.muted }}>{t.regionNote}</Text>
+        <Choice title={t.regionEu} sub={t.regionEuSub} on={app.region === 'eu'} onPress={() => app.setPrefs({ region: 'eu' })} />
+        <Choice title={t.regionGulf} sub={t.regionGulfSub} on={app.region === 'gulf'} onPress={() => app.setPrefs({ region: 'gulf' })} />
+        {app.region === 'gulf' ? (
+          <View style={{ gap: 8, padding: 12, borderRadius: 16, backgroundColor: theme.chip }}>
+            <Text style={{ fontSize: 13.5, fontWeight: '700', color: theme.ink }}>{t.gulfHeading}</Text>
+            {[t.gulfPhoto, t.gulfPersonal, t.gulfLength, t.gulfArabic, t.gulfAi].map((line, i) => (
+              <View key={i} style={{ flexDirection: 'row', gap: 8 }}>
+                <Text style={{ color: theme.good, fontSize: 14, fontWeight: '700' }}>✓</Text>
+                <Text style={{ flex: 1, fontSize: 13, lineHeight: 18, color: theme.muted }}>{line}</Text>
+              </View>
+            ))}
+            <Text style={{ fontSize: 12.5, lineHeight: 17, color: theme.dark ? '#F2C2BC' : theme.danger }}>{t.gulfHonesty}</Text>
+          </View>
+        ) : null}
       </Card>
 
       <Card>
@@ -143,14 +163,35 @@ export default function Settings({ go, glow }: { go: (r: 'manual' | 'privacy' | 
       </Card>
 
       <Card>
+        <Label>{t.protectSection}</Label>
+        {[[t.protectAuth, t.protectAuthSub], [t.protectCode, t.protectCodeSub], [t.protectKeys, t.protectKeysSub]].map(([title, sub], i) => (
+          <View key={i}>
+            {i ? <Divider /> : null}
+            <View style={{ flexDirection: 'row', gap: 12, marginTop: i ? 10 : 0 }}>
+              <View style={{ width: 36, height: 36, borderRadius: 11, backgroundColor: theme.dark ? 'rgba(95,196,180,0.12)' : theme.chip, alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ fontSize: 16, color: theme.good }}>✓</Text>
+              </View>
+              <View style={{ flex: 1, gap: 2 }}>
+                <Text style={{ fontSize: 15, fontWeight: '700', color: theme.ink }}>{title}</Text>
+                <Text style={{ fontSize: 12.5, lineHeight: 18, color: theme.muted }}>{sub}</Text>
+              </View>
+            </View>
+          </View>
+        ))}
+      </Card>
+
+      <Card>
         <Label>{t.aboutSection}</Label>
         <Row title={t.manual} sub={t.manualSub} onPress={() => go('manual')} />
         <Divider />
         <Row title={t.privacy} sub={t.privacySub} onPress={() => go('privacy')} />
+        <Divider />
+        <Row title={t.uninstall} sub={t.uninstallSub} onPress={() => go('uninstall')} />
         <Text style={{ fontSize: 13, color: theme.muted }}>{t.developer}</Text>
       </Card>
       <Text style={{ textAlign: 'center', fontSize: 12.5, color: look.fg }}>{`ATS v${version}`}</Text>
-    </ScrollView>
+      </ScrollView>
+    </Screen>
   );
 }
 
@@ -172,6 +213,68 @@ export function ManualScreen({ onBack }: { onBack: () => void }) {
           </Card>
         ))}
         <Text style={{ textAlign: 'center', fontSize: 12.5, color: theme.muted }}>{t.developer}</Text>
+      </ScrollView>
+    </Screen>
+  );
+}
+
+export function UninstallScreen({ onBack }: { onBack: () => void }) {
+  const { theme, t } = useApp();
+  const [msg, setMsg] = useState('');
+  const [err, setErr] = useState('');
+  const backup = async (share: boolean) => {
+    setErr(''); setMsg('');
+    try {
+      const { buildBackup } = await import('../backup');
+      const { saveBytesToDownloads, shareBytes } = await import('../files');
+      const b = await buildBackup();
+      if (share) { await shareBytes(b.name, 'application/zip', b.bytes); setMsg(fill(t.backupMade, { name: b.name })); }
+      else { const r = await saveBytesToDownloads(b.name, 'application/zip', b.bytes); setMsg(fill(t.backupMade, { name: r.name })); }
+    } catch (e) { setErr(fill(t.backupFailed, { e: (e as Error)?.message ?? '' })); }
+  };
+  const deleteAll = async () => {
+    setErr(''); setMsg('');
+    try { const { deleteSaved } = await import('../files'); const n = await deleteSaved(); setMsg(`${n}`); } catch (e) { setErr(fill(t.backupFailed, { e: (e as Error)?.message ?? '' })); }
+  };
+  const openUninstall = async () => {
+    try { const IntentLauncher = await import('expo-intent-launcher'); await IntentLauncher.startActivityAsync('android.intent.action.DELETE', { data: 'package:se.sncab.ats' }); } catch {}
+  };
+  const restore = async () => {
+    setErr(''); setMsg('');
+    try {
+      const DocumentPicker = await import('expo-document-picker');
+      const r = await DocumentPicker.getDocumentAsync({ type: ['application/zip', 'application/octet-stream'], copyToCacheDirectory: true });
+      const a = r.canceled ? null : r.assets[0];
+      if (!a) return;
+      const { readUri } = await import('../files');
+      const { restoreBackup } = await import('../backup');
+      const okRestore = await restoreBackup(await readUri(a.uri));
+      setMsg(okRestore ? t.restoreDone : fill(t.restoreFailed, { e: 'format' }));
+    } catch (e) { setErr(fill(t.restoreFailed, { e: (e as Error)?.message ?? '' })); }
+  };
+  return (
+    <Screen>
+      <Header title={t.uninstall} onBack={onBack} />
+      <ScrollView contentContainerStyle={{ gap: 14, paddingBottom: 24 }} showsVerticalScrollIndicator={false}>
+        <Card style={{ gap: 10 }}>
+          <Text style={{ fontSize: 14, lineHeight: 20, color: theme.muted }}>{t.uninstallIntro}</Text>
+          <Btn title={t.backupNow} onPress={() => backup(false)} />
+          <Btn kind="secondary" title={t.backupShare} onPress={() => backup(true)} />
+          {msg ? <Text style={{ fontSize: 13.5, color: theme.good }}>{msg}</Text> : null}
+          {err ? <Text style={{ fontSize: 13.5, color: theme.danger }}>{err}</Text> : null}
+        </Card>
+        <Card style={{ gap: 10 }}>
+          <Label>{t.keepFolderTitle}</Label>
+          <Text style={{ fontSize: 13.5, lineHeight: 19, color: theme.muted }}>{t.keepFolderSub}</Text>
+          <Btn kind="danger" title={t.deleteAll} onPress={deleteAll} />
+          <Text style={{ fontSize: 12.5, color: theme.muted }}>{t.deleteAllSub}</Text>
+        </Card>
+        <Btn title={t.openUninstall} onPress={openUninstall} />
+        <Card style={{ gap: 10 }}>
+          <Label>{t.restoreTitle}</Label>
+          <Text style={{ fontSize: 13.5, lineHeight: 19, color: theme.muted }}>{t.restoreSub}</Text>
+          <Btn kind="secondary" title={t.restorePick} onPress={restore} />
+        </Card>
       </ScrollView>
     </Screen>
   );

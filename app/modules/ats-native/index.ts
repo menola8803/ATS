@@ -12,6 +12,10 @@ type AtsNative = {
   listDownloads(): Promise<DownloadFile[]>;
   /** Asks Android to index Download/ATS so newly added files are found. */
   rescan(): Promise<void>;
+  /** Best-effort delete of the .docx/.odt files ATS owns in Download/ATS. Returns how many were deleted. */
+  deleteDownloads(): Promise<number>;
+  /** True when the app is signed with the developer's key (fails open on error). */
+  isAuthentic(): boolean;
   /** Reads a file (content:// or file://) as Base64. */
   readBase64(uri: string): Promise<string>;
   markUpdatePending(title: string, body: string, channel: string): void;

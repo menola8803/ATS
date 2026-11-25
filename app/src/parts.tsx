@@ -4,6 +4,7 @@ import { View } from 'react-native';
 import { useApp } from './store';
 import { Text } from './ui';
 import { PLACEHOLDERS } from './core/ai';
+import type { Thumb } from './core/thumb';
 
 /** The score in a ring: green when tested (as in the mockup), grey for the score before. */
 export function ScoreRing({ score, size = 36, dim }: { score: number; size?: number; dim?: boolean }) {
@@ -47,6 +48,28 @@ export function Paper({ photo, height = 150, children }: { photo?: boolean; heig
       {line('34%', '#17393E', 4)}{line('92%')}{line('84%')}{line('60%')}
       {line('40%', '#17393E', 4, 4)}{line('90%')}{line('76%')}{line('50%')}
       {children}
+    </View>
+  );
+}
+
+/** A real miniature of a document, drawn from its paragraphs: the name, headings, body text and anything an ATS cannot read (red). */
+export function CvThumb({ thumb, height = 150 }: { thumb: Thumb; height?: number }) {
+  const bar = (w: number, c: string, h: number) => <View style={{ height: h, width: `${Math.round(w * 100)}%`, borderRadius: 2, backgroundColor: c }} />;
+  return (
+    <View style={{ height, borderRadius: 10, overflow: 'hidden', backgroundColor: '#F4F1EA', paddingHorizontal: 11, paddingTop: 12, gap: 4 }}>
+      {thumb.photo ? (
+        <View style={{ flexDirection: 'row', gap: 7, marginBottom: 2 }}>
+          <View style={{ width: 20, height: 24, borderRadius: 4, backgroundColor: '#C9C2B2' }} />
+          <View style={{ flex: 1, justifyContent: 'center', gap: 4 }}>{bar(0.7, '#17494F', 5)}{bar(0.9, '#B8B0A0', 3)}</View>
+        </View>
+      ) : null}
+      {thumb.lines.map((l, i) => l.t === 'bad'
+        ? <View key={i} style={{ height: 11, borderRadius: 2, borderWidth: 1, borderColor: '#C7876F', flexDirection: 'row' }}>
+            <View style={{ flex: 1, borderRightWidth: 1, borderColor: '#C7876F' }} /><View style={{ flex: 1 }} />
+          </View>
+        : l.t === 'name' ? <View key={i} style={{ marginBottom: 1 }}>{bar(l.w, '#17494F', 6)}</View>
+        : l.t === 'head' ? <View key={i} style={{ marginTop: 3 }}>{bar(l.w, '#1F5F66', 4)}</View>
+        : <View key={i}>{bar(l.w, '#B8B0A0', 3)}</View>)}
     </View>
   );
 }

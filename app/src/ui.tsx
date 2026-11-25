@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text as RNText, TextInput as RNTextInput, TextInputProps, TextProps, TextStyle, View, ViewStyle } from 'react-native';
+import { Keyboard, Pressable, StyleSheet, Text as RNText, TextInput as RNTextInput, TextInputProps, TextProps, TextStyle, View, ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
 import { useApp } from './store';
@@ -177,7 +177,18 @@ export function Toggle({ title, on, onChange }: { title: string; on: boolean; on
   );
 }
 
-export type TabName = 'home' | 'eval' | 'docs' | 'settings';
+/** True while the on-screen keyboard is open, so bars that would cover a field can be hidden. */
+export function useKeyboardOpen() {
+  const [open, setOpen] = React.useState(false);
+  React.useEffect(() => {
+    const show = Keyboard.addListener('keyboardDidShow', () => setOpen(true));
+    const hide = Keyboard.addListener('keyboardDidHide', () => setOpen(false));
+    return () => { show.remove(); hide.remove(); };
+  }, []);
+  return open;
+}
+
+export type TabName = 'home' | 'eval' | 'docs';
 
 /** Room at the bottom of a tab page, so the last line can be scrolled up above the floating menu. */
 export const TAB_SPACE = 96;
@@ -201,19 +212,15 @@ function TabIcon({ tab, color, fill }: { tab: TabName; color: string; fill: stri
         <Path {...line} fill="none" d="M5 7v12a1.5 1.5 0 0 0 1.5 1.5H15" />
         <Path {...line} strokeWidth={1.4} d="M10.5 8.5h6M10.5 11.5h6M10.5 14.5h3.5" />
       </> : null}
-      {tab === 'settings' ? <>
-        <Circle cx={12} cy={12} r={3.2} fill={fill} stroke={color} strokeWidth={1.6} />
-        <Path {...line} fill="none" strokeWidth={1.5} d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.5-2-3.4-2.3.9a7.5 7.5 0 0 0-2.6-1.5L14.1 2.5h-4l-.4 2.5a7.5 7.5 0 0 0-2.6 1.5l-2.3-.9-2 3.4 2 1.5a7.6 7.6 0 0 0 0 3l-2 1.5 2 3.4 2.3-.9a7.5 7.5 0 0 0 2.6 1.5l.4 2.5h4l.4-2.5a7.5 7.5 0 0 0 2.6-1.5l2.3.9 2-3.4z" />
-      </> : null}
     </Svg>
   );
 }
 
 /** The bottom menu: floats over the page and is slightly see-through, so long pages show faintly behind it. */
-export function TabBar({ tab, setTab, glow }: { tab: TabName; setTab: (t: TabName) => void; glow?: boolean }) {
+export function TabBar({ tab, setTab }: { tab: TabName; setTab: (t: TabName) => void }) {
   const { theme, t } = useApp();
   const i = useSafeAreaInsets();
-  const items: [TabName, string][] = [['home', t.tabHome], ['eval', t.tabEval], ['docs', t.tabDocs], ['settings', t.tabSettings]];
+  const items: [TabName, string][] = [['home', t.tabHome], ['eval', t.tabEval], ['docs', t.tabDocs]];
   const glass = theme.dark ? 'rgba(19,34,37,0.78)' : 'rgba(250,248,244,0.86)';
   return (
     <View accessibilityLabel={t.mainMenu} style={{ position: 'absolute', left: 12, right: 12, bottom: i.bottom + 8, flexDirection: 'row', gap: 2, backgroundColor: glass, borderColor: theme.dark ? 'rgba(232,176,74,0.22)' : theme.line, borderWidth: 1, borderRadius: 24, padding: 5, elevation: 8, shadowColor: '#000', shadowOpacity: 0.35, shadowRadius: 14, shadowOffset: { width: 0, height: 6 } }}>
@@ -221,10 +228,9 @@ export function TabBar({ tab, setTab, glow }: { tab: TabName; setTab: (t: TabNam
         const on = tab === k, color = on ? theme.tabActive : theme.muted;
         const fill = on ? (theme.dark ? 'rgba(232,176,74,0.22)' : 'rgba(38,35,31,0.12)') : (theme.dark ? 'rgba(183,198,195,0.08)' : 'rgba(106,99,88,0.08)');
         return (
-          <Pressable key={k} accessibilityRole="tab" accessibilityLabel={glow && k === 'settings' ? `${label} · ${t.newVersion}` : label} accessibilityState={{ selected: on }} onPress={() => setTab(k)}
+          <Pressable key={k} accessibilityRole="tab" accessibilityLabel={label} accessibilityState={{ selected: on }} onPress={() => setTab(k)}
             style={{ flex: 1, minHeight: 60, borderRadius: 19, alignItems: 'center', justifyContent: 'center', gap: 2, backgroundColor: on ? (theme.dark ? 'rgba(232,176,74,0.12)' : theme.chip) : 'transparent', borderWidth: on ? 1 : 0, borderColor: theme.dark ? 'rgba(232,176,74,0.5)' : theme.line }}>
             <TabIcon tab={k} color={color} fill={fill} />
-            {glow && k === 'settings' ? <View style={{ position: 'absolute', top: 6, right: 14, width: 9, height: 9, borderRadius: 5, backgroundColor: '#E8B04A', borderWidth: 2, borderColor: theme.card }} /> : null}
             <Text numberOfLines={1} style={{ fontSize: 10.5, fontWeight: on ? '700' : '600', color, maxWidth: '100%', paddingHorizontal: 1 }}>{label}</Text>
             {on ? <View style={{ width: 16, height: 3, borderRadius: 2, backgroundColor: theme.tabActive }} /> : null}
           </Pressable>

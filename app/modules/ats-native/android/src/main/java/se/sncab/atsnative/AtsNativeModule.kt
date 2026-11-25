@@ -3,6 +3,7 @@ package se.sncab.atsnative
 import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
+import android.content.pm.PackageManager
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
@@ -12,6 +13,7 @@ import android.util.Base64
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 import java.io.File
+import java.security.MessageDigest
 
 // Files and updates for ATS:
 //  - saveDownload / listDownloads: the documents ATS saves in Download/ATS (MediaStore, no storage permission needed)
@@ -20,6 +22,24 @@ import java.io.File
 class AtsNativeModule : Module() {
   private val ctx: Context get() = appContext.reactContext ?: throw Exception("No context")
   private val folder = "Download/ATS"
+  // SHA-256 of the developer's signing certificate (same as app/signing/cert-sha256.txt).
+  private val EXPECTED = "fafcc6a91a69313a437ce1168ec3095b171de7b6938aba57a16491bec2683398"
+
+  // True when the app is signed with the developer's key. Fails open on an unexpected error, so a
+  // genuine user is never locked out; only a re-signed copy (a different certificate) returns false.
+  private fun authentic(): Boolean {
+    return try {
+      val pm = ctx.packageManager
+      @Suppress("DEPRECATION")
+      val sigs = if (Build.VERSION.SDK_INT >= 28) {
+        pm.getPackageInfo(ctx.packageName, PackageManager.GET_SIGNING_CERTIFICATES).signingInfo?.apkContentsSigners
+      } else {
+        pm.getPackageInfo(ctx.packageName, PackageManager.GET_SIGNATURES).signatures
+      } ?: return true
+      val md = MessageDigest.getInstance("SHA-256")
+      sigs.any { md.digest(it.toByteArray()).joinToString("") { b -> "%02x".format(b) }.equals(EXPECTED, true) }
+    } catch (_: Exception) { true }
+  }
 
   // Tell the media scanner about the files in Download/ATS so newly added ones are indexed.
   private fun rescan() {
@@ -78,6 +98,8 @@ class AtsNativeModule : Module() {
     // is registered in MediaStore and shows up in the list. Best effort; ignored on failure.
     AsyncFunction("rescan") { rescan() }
 
+    Function("isAuthentic") { authentic() }
+
     AsyncFunction("listDownloads") {
       val out = mutableListOf<Map<String, Any?>>()
       if (Build.VERSION.SDK_INT < 29) return@AsyncFunction out
@@ -105,6 +127,25 @@ class AtsNativeModule : Module() {
         }
       }
       out
+    }
+
+    // Best-effort delete of the .docx/.odt files ATS owns in Download/ATS. Files added from outside
+    // may be protected by Android and are skipped. Returns how many were deleted.
+    AsyncFunction("deleteDownloads") {
+      if (Build.VERSION.SDK_INT < 29) return@AsyncFunction 0
+      val r = ctx.contentResolver
+      val collection = MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL)
+      var deleted = 0
+      r.query(collection, arrayOf(MediaStore.MediaColumns._ID, MediaStore.MediaColumns.DISPLAY_NAME),
+        "${MediaStore.MediaColumns.RELATIVE_PATH} LIKE ?", arrayOf("$folder/%"), null)?.use { c ->
+        while (c.moveToNext()) {
+          val name = (c.getString(1) ?: "").lowercase()
+          if (!name.endsWith(".docx") && !name.endsWith(".odt")) continue
+          val uri = ContentUris.withAppendedId(collection, c.getLong(0))
+          try { if (r.delete(uri, null, null) > 0) deleted++ } catch (_: Exception) {}
+        }
+      }
+      deleted
     }
 
     AsyncFunction("readBase64") { uri: String ->

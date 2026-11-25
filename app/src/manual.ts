@@ -41,9 +41,15 @@ const sv: ManualSection[] = [
     'AI:n tar då med annonsens viktigaste ord i förslagen – men bara där ditt CV redan visar att du har den kunskapen.',
   ] },
   { title: 'Spara och jämföra', items: [
-    'Tryck på Spara nytt, välj filnamn och tryck Spara. Det förbättrade CV:t sparas som en ny fil i samma format.',
+    'Tryck på Spara nytt, välj filnamn och format och tryck Spara. Det förbättrade CV:t sparas som en ny fil.',
+    'Samma format behåller originalets layout. Väljer du det andra formatet byggs ett rent, ATS-säkert dokument – tabeller och rutor blir stycken och bilder tas bort.',
     'Allt sparas i mappen Download/ATS, så du når filerna från Filer på telefonen eller från datorn. Originalet ändras aldrig.',
     'Se då och nu visar hela dokumentet före och efter. Markera ändrade stycken lyfter fram allt som AI:n har skrivit om.',
+  ] },
+  { title: 'Region', items: [
+    'Under Inställningar › Region väljer du var du söker jobb: Sverige/Europa eller Gulfstaterna.',
+    'I Gulf-läget dras inga poäng för ett foto, personuppgifter kollas (nationalitet, visum/Iqama/QID, tillgänglighet), längre CV godkänns och arabiska rubriker känns igen.',
+    'Ärlighetsspärren gäller även där – fyll bara i uppgifter som stämmer.',
   ] },
   { title: 'Dokument', items: [
     'Under Dokument finns allt du har öppnat och sparat, och demo-CV:na.',
@@ -58,9 +64,16 @@ const sv: ManualSection[] = [
     'Skriv titel, företag och årtal på samma rad för varje anställning.',
   ] },
   { title: 'Inställningar', items: [
-    'Tema: Mörk eller Beige, samma som i Alif. Språk: svenska eller engelska.',
+    'Inställningarna nås via kugghjulet uppe i hörnet på varje flik.',
+    'Tema: Mörk eller Beige, samma som i Alif. Språk: svenska eller engelska. Region: Sverige/Europa eller Gulfstaterna.',
     'AI: antal förslag per stycke, ton, Snabb (Haiku) eller Bäst (Sonnet), och din API-nyckel.',
+    'Skydd: appen startar bara om den är signerad med utvecklarens nyckel, och koden är skyddad. API-nyckeln stannar på telefonen.',
     'Uppdateringar: ATS söker själv efter nya versioner, och kugghjulet lyser när en ny finns.',
+  ] },
+  { title: 'Avinstallera', items: [
+    'Under Inställningar › Avinstallera kan du först ta en säkerhetskopia av inställningar och poäng till Download/ATS. Nyckeln kopieras aldrig.',
+    'Välj att behålla Download/ATS (dina sparade CV ligger kvar) eller ta bort det ATS har sparat. Öppna sedan avinstallationen.',
+    'Återställ från säkerhetskopia läser tillbaka inställningar och poäng från en ATS-backup.',
   ] },
 ];
 
@@ -101,9 +114,15 @@ const en: ManualSection[] = [
     'The AI then works the ad’s most important words into its suggestions – but only where your CV already shows that you have that skill.',
   ] },
   { title: 'Saving and comparing', items: [
-    'Tap Save new, choose a file name and tap Save. The improved CV is saved as a new file in the same format.',
+    'Tap Save new, choose a file name and format and tap Save. The improved CV is saved as a new file.',
+    'The same format keeps the original layout. If you choose the other format, a clean, ATS-safe document is built – tables and boxes become paragraphs and images are dropped.',
     'Everything is saved in the Download/ATS folder, so you can reach the files from Files on the phone or from a computer. The original is never changed.',
     'See before and after shows the whole document before and after. Highlight changed paragraphs marks everything the AI rewrote.',
+  ] },
+  { title: 'Region', items: [
+    'Under Settings › Region you choose where you are applying: Sweden/Europe or the Gulf states.',
+    'In Gulf mode a photo costs no points, personal details are checked (nationality, visa/Iqama/QID, availability), longer CVs are accepted and Arabic headings are recognised.',
+    'The honesty lock applies there too – only fill in details that are true.',
   ] },
   { title: 'Documents', items: [
     'Documents holds everything you have opened and saved, and the demo CVs.',
@@ -118,9 +137,16 @@ const en: ManualSection[] = [
     'Write title, company and years on the same line for each job.',
   ] },
   { title: 'Settings', items: [
-    'Theme: Dark or Beige, the same as in Alif. Language: Swedish or English.',
+    'Settings open from the gear in the top corner on every tab.',
+    'Theme: Dark or Beige, the same as in Alif. Language: Swedish or English. Region: Sweden/Europe or the Gulf states.',
     'AI: suggestions per paragraph, tone, Fast (Haiku) or Best (Sonnet), and your API key.',
+    'Protection: the app starts only if it is signed with the developer’s key, and the code is protected. The API key stays on the phone.',
     'Updates: ATS looks for new versions by itself, and the gear glows when there is one.',
+  ] },
+  { title: 'Uninstall', items: [
+    'Under Settings › Uninstall you can first back up your settings and scores to Download/ATS. The key is never copied.',
+    'Choose to keep Download/ATS (your saved CVs stay) or remove what ATS has saved. Then open the uninstaller.',
+    'Restore from backup reads settings and scores back from an ATS backup.',
   ] },
 ];
 

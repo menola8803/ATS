@@ -5,6 +5,8 @@ import { Theme, ThemeName, themes } from './theme';
 import { dict, Lang, Strings } from './i18n';
 import type { Kind } from './core/cv';
 import type { ModelKey, Tone } from './core/ai';
+import type { Region } from './core/ats';
+import type { Thumb } from './core/thumb';
 
 /** A document the person has opened (a private copy is kept in the app, so it can be opened again). */
 export type Recent = { key: string; name: string; kind: Kind; path: string; at: number };
@@ -17,8 +19,9 @@ type Saved = {
   tone: Tone;
   useAd: boolean;             // the job ad steers the suggestions
   showDemo: boolean;          // the three demo CVs are shown under Documents
+  region: Region;             // eu (Sweden/Europe) or gulf (GCC)
   ad: string;                 // the job ad pasted on the home screen
-  scores: Record<string, { score: number; at: number }>; // latest ATS score per document key
+  scores: Record<string, { score: number; at: number; thumb?: Thumb }>; // latest ATS score and page miniature per document key
   recent: Recent[];
   updateTag: string; updateChecked: number; updateAuto: boolean;
   folderMade: boolean;        // Download/ATS has been created
@@ -29,7 +32,7 @@ const API_KEY = 'ats.apikey.v1';
 const MAX_RECENT = 40;
 
 const empty = (): Saved => ({
-  themeName: 'dark', lang: 'en', model: 'fast', count: 2, tone: 'neutral', useAd: true, showDemo: true, ad: '',
+  themeName: 'dark', lang: 'en', model: 'fast', count: 2, tone: 'neutral', useAd: true, showDemo: true, region: 'eu', ad: '',
   scores: {}, recent: [], updateTag: '', updateChecked: 0, updateAuto: true, folderMade: false,
 });
 
@@ -38,7 +41,7 @@ type Ctx = Saved & {
   ready: boolean; theme: Theme; t: Strings;
   apiKey: string; setApiKey: (k: string) => Promise<void>;
   setPrefs: (p: Partial<Prefs>) => void;
-  setScore: (key: string, score: number) => void;
+  setScore: (key: string, score: number, thumb?: Thumb) => void;
   addRecent: (r: Recent) => void;
   removeRecent: (key: string) => void;
 };
@@ -59,6 +62,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           const merged = { ...empty(), ...JSON.parse(raw) } as Saved;
           if (!themes[merged.themeName]) merged.themeName = 'dark';
           if (merged.lang !== 'sv' && merged.lang !== 'en') merged.lang = 'en';
+          if (merged.region !== 'eu' && merged.region !== 'gulf') merged.region = 'eu';
           if (![1, 2, 3].includes(merged.count)) merged.count = 2;
           if (!Array.isArray(merged.recent)) merged.recent = [];
           setS(merged);
@@ -83,7 +87,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setKey(v);
   }, []);
   const setPrefs = useCallback((p: Partial<Prefs>) => setS(o => ({ ...o, ...p })), []);
-  const setScore = useCallback((key: string, score: number) => setS(o => ({ ...o, scores: { ...o.scores, [key]: { score, at: Date.now() } } })), []);
+  const setScore = useCallback((key: string, score: number, thumb?: Thumb) => setS(o => ({ ...o, scores: { ...o.scores, [key]: { score, at: Date.now(), thumb: thumb ?? o.scores[key]?.thumb } } })), []);
   const addRecent = useCallback((r: Recent) => setS(o => ({ ...o, recent: [r, ...o.recent.filter(x => x.key !== r.key)].slice(0, MAX_RECENT) })), []);
   const removeRecent = useCallback((key: string) => setS(o => ({ ...o, recent: o.recent.filter(x => x.key !== key) })), []);
 

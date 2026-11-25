@@ -4,7 +4,7 @@ import Svg, { Path } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../store';
 import { useDoc } from '../session';
-import { AtsMark, Btn, Card, H1, Label, Segmented, SmallBtn, Sub, TAB_SPACE, Text, TextInput, useButtonLook } from '../ui';
+import { AtsMark, Btn, Card, GearButton, H1, Label, Segmented, SmallBtn, Sub, TAB_SPACE, Text, TextInput, useButtonLook, useKeyboardOpen } from '../ui';
 import { ScoreRing, Tag, WithPlaceholders } from '../parts';
 import { fill, Strings } from '../i18n';
 import { candidates, Check, CheckId } from '../core/ats';
@@ -16,7 +16,9 @@ const CHECK_TEXT: Record<CheckId, [keyof Strings, keyof Strings]> = {
   tables: ['chkTablesOk', 'chkTablesBad'], header: ['chkHeaderOk', 'chkHeaderBad'], boxes: ['chkBoxesOk', 'chkBoxesBad'],
   images: ['chkImagesOk', 'chkImagesBad'], columns: ['chkColumnsOk', 'chkColumnsBad'], profile: ['chkProfileOk', 'chkProfileBad'],
   experience: ['chkExperienceOk', 'chkExperienceBad'], education: ['chkEducationOk', 'chkEducationBad'], skills: ['chkSkillsOk', 'chkSkillsBad'],
-  email: ['chkEmailOk', 'chkEmailBad'], phone: ['chkPhoneOk', 'chkPhoneBad'], linkedin: ['chkLinkedinOk', 'chkLinkedinBad'], length: ['chkLengthOk', 'chkLengthBad'],
+  email: ['chkEmailOk', 'chkEmailBad'], phone: ['chkPhoneOk', 'chkPhoneBad'], linkedin: ['chkLinkedinOk', 'chkLinkedinBad'],
+  nationality: ['chkNationalityOk', 'chkNationalityBad'], visa: ['chkVisaOk', 'chkVisaBad'], availability: ['chkAvailabilityOk', 'chkAvailabilityBad'],
+  length: ['chkLengthOk', 'chkLengthBad'],
 };
 export const checkText = (c: Check, t: Strings) => fill(t[CHECK_TEXT[c.id][c.ok ? 0 : 1]] as string, { n: c.count ?? 0 });
 
@@ -36,12 +38,16 @@ export default function Evaluate({ onPick, onDemo, onSave, onSettings }: { onPic
   const insets = useSafeAreaInsets();
   const [mode, setMode] = useState<'orig' | 'new'>('new');
   const [details, setDetails] = useState(false);
+  const kbd = useKeyboardOpen();
   const d = s.doc;
 
   if (!d) {
     return (
       <ScrollView contentContainerStyle={{ gap: 14, paddingBottom: TAB_SPACE + 12 }}>
-        <H1>{t.tabEval}</H1>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+          <View style={{ flex: 1 }}><H1>{t.tabEval}</H1></View>
+          <GearButton onPress={onSettings} />
+        </View>
         <Card style={{ alignItems: 'center', gap: 12 }}>
           <AtsMark size={96} />
           <Text style={{ fontSize: 18, fontWeight: '700', color: theme.ink }}>{t.evalEmptyTitle}</Text>
@@ -89,6 +95,7 @@ export default function Evaluate({ onPick, onDemo, onSave, onSettings }: { onPic
             ) : <ScoreRing score={score} size={52} />}
             <Text style={{ fontSize: 10.5, fontWeight: '700', letterSpacing: 0.6, color: theme.muted }}>{t.scoreLabel.toUpperCase()}</Text>
           </Pressable>
+          <GearButton onPress={onSettings} />
         </View>
 
         {details ? (
@@ -177,6 +184,10 @@ export default function Evaluate({ onPick, onDemo, onSave, onSettings }: { onPic
                   {placeholders.length ? (
                     <View style={{ gap: 8, padding: 12, borderRadius: 16, borderWidth: 1, borderStyle: 'dashed', borderColor: look.fg }}>
                       <Text style={{ fontSize: 12.5, lineHeight: 17, color: theme.muted }}>{t.fillHint}</Text>
+                      <View style={{ padding: 10, borderRadius: 12, backgroundColor: theme.card }}>
+                        <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 0.6, color: theme.muted, marginBottom: 4 }}>{t.previewLabel.toUpperCase()}</Text>
+                        <WithPlaceholders text={now} size={14} />
+                      </View>
                       {placeholders.map((ph, n) => (
                         <TextInput key={n} accessibilityLabel={fill(t.fillLabel, { p: ph })} placeholder={fill(t.fillLabel, { p: ph })} placeholderTextColor={theme.muted}
                           value={d.fills[p.id]?.[n] ?? ''} onChangeText={v => s.setFill(p.id, n, v)}
@@ -196,7 +207,7 @@ export default function Evaluate({ onPick, onDemo, onSave, onSettings }: { onPic
         })}
         {adv ? <SmallBtn title={s.busy ? t.analysing.replace('{n}', String(ids.size)) : t.newSuggestions} onPress={s.fetchAdvice} disabled={s.busy} /> : null}
       </ScrollView>
-      {adv ? (
+      {adv && !kbd ? (
         <View style={{ position: 'absolute', left: 0, right: 0, bottom: insets.bottom + 84, flexDirection: 'row', gap: 10, paddingVertical: 8, backgroundColor: theme.bg }}>
           <View style={{ flex: 1 }}><Btn kind="secondary" title={t.useAllFirst} onPress={s.useAllFirst} /></View>
           <View style={{ flex: 1 }}><Btn title={t.saveNew} onPress={save} /></View>

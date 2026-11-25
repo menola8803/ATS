@@ -123,6 +123,50 @@ const sv = {
   updatedTitle: 'ATS är uppdaterad till {v}', updatedBody: 'Tryck för att öppna ATS.', updateChannel: 'Uppdatering av ATS',
   updateAutoLabel: 'Sök efter ny version automatiskt',
   updateHow: 'ATS kollar högst var sjätte timme när appen öppnas. Finns en ny version lyser kugghjulet. Tryck på Ladda ner och installera, så öppnas Androids installationsruta – tryck Uppdatera där. Allt ditt finns kvar.',
+
+  // checks: Gulf personal details
+  chkNationalityOk: 'Nationalitet angiven', chkNationalityBad: 'Ingen nationalitet – förväntas i Gulfstaterna',
+  chkVisaOk: 'Visumstatus angiven', chkVisaBad: 'Ingen visumstatus (visa/Iqama/QID) – förväntas i Gulfstaterna',
+  chkAvailabilityOk: 'Tillgänglighet angiven', chkAvailabilityBad: 'Ingen tillgänglighet – rekommenderas i Gulfstaterna',
+
+  // save: format choice
+  formatSameShort: 'behåller layouten', formatConvertNote: 'Det andra formatet byggs om som ett rent, ATS-säkert dokument. Tabeller och rutor blir stycken, bilder tas bort.',
+
+  // settings: region
+  regionSection: 'Region', regionLabel: 'Var söker du jobb?', regionNote: 'Olika länder vill se olika saker i ett CV. Valet styr hur poängen räknas.',
+  regionEu: 'Sverige / Europa', regionEuSub: 'Inget foto, inga personuppgifter, 1–2 sidor',
+  regionGulf: 'Gulfstaterna', regionGulfSub: 'Qatar, Saudiarabien, Oman, UAE, Kuwait, Bahrain',
+  gulfHeading: 'Så ändras Gulf-läget',
+  gulfPhoto: 'Foto tillåts – drar inte poäng. Tabeller och rutor gör det fortfarande.',
+  gulfPersonal: 'Personuppgifter kollas: nationalitet, visum/Iqama/QID och tillgänglighet.',
+  gulfLength: 'Längre CV ok – godkänd längd upp till cirka 1 400 ord.',
+  gulfArabic: 'Arabiska rubriker känns igen (الملخص، الخبرة، التعليم، المهارات).',
+  gulfAi: 'AI:n anpassar texten för en Gulfrekryterare.',
+  gulfHonesty: 'Ärlighetsspärren gäller – fyll bara i uppgifter som stämmer.',
+
+  // settings: protection
+  protectSection: 'Skydd',
+  protectAuth: 'Äkthetskoll', protectAuthSub: 'Appen startar bara om den är signerad med utvecklarens nyckel. En omsignerad kopia stoppas.',
+  protectCode: 'Koden är skyddad', protectCodeSub: 'Byggd med R8, som förvränger koden så appen är svår att bakåtkompilera.',
+  protectKeys: 'Dina nycklar stannar', protectKeysSub: 'API-nyckeln sparas bara på telefonen och skickas bara till Anthropic.',
+  notAuthenticTitle: 'Den här kopian är inte äkta', notAuthenticBody: 'ATS är signerad med en annan nyckel än utvecklarens. Installera ATS från den riktiga nedladdningssidan. Avinstallera den här kopian först.',
+
+  // file picker
+  pickTitle: 'Välj CV', pickFolder: 'Download/ATS',
+  pickAccessTitle: 'Visa alla CV i mappen', pickAccessBody: 'Ge ATS åtkomst till Download/ATS en gång, så listas även filer du lagt dit från dator eller mejl.', pickGiveAccess: 'Ge åtkomst',
+  pickAll: 'Alla', pickOriginal: 'Original', pickImproved: 'Förbättrade', pickCount: '{n} dokument · nyast först',
+  improvedBy: 'Förbättrad av ATS', pickBrowse: 'Bläddra på telefonen…', pickBrowseSub: 'För ett CV i Drive, mejl eller annan mapp', pickEmpty: 'Inga CV i Download/ATS än.',
+
+  // uninstall
+  uninstallSection: 'Avinstallera', uninstall: 'Avinstallera ATS', uninstallSub: 'Säkerhetskopiera först om du vill',
+  uninstallIntro: 'Innan du avinstallerar kan du ta en säkerhetskopia av dina inställningar, poäng och sparade CV. Nyckeln kopieras aldrig.',
+  backupNow: 'Säkerhetskopiera till Download/ATS', backupMade: 'Säkerhetskopia sparad: {name}', backupShare: 'Dela säkerhetskopian', backupFailed: 'Kunde inte säkerhetskopiera: {e}',
+  keepFolderTitle: 'Behåll dokumenten?', keepFolder: 'Behåll Download/ATS (standard)', keepFolderSub: 'Dina sparade CV ligger kvar efter avinstallationen.',
+  deleteAll: 'Ta bort allt i Download/ATS', deleteAllSub: 'Android ber dig bekräfta borttagningen.',
+  openUninstall: 'Öppna avinstallationen', restoreTitle: 'Återställ från säkerhetskopia', restoreSub: 'Välj en ATS-backup (.zip) för att få tillbaka inställningar och poäng.', restorePick: 'Välj säkerhetskopia', restoreDone: 'Återställt från säkerhetskopian.', restoreFailed: 'Kunde inte återställa: {e}',
+
+  // keyboard / fill preview
+  previewLabel: 'Förhandsvisning', fieldNext: 'Nästa', fieldDone: 'Klar',
 };
 
 export type Strings = { [K in keyof typeof sv]: (typeof sv)[K] extends string[] ? string[] : string };
@@ -241,6 +285,43 @@ const en: Strings = {
   updatedTitle: 'ATS is updated to {v}', updatedBody: 'Tap to open ATS.', updateChannel: 'ATS update',
   updateAutoLabel: 'Look for a new version automatically',
   updateHow: 'ATS looks at most every six hours when the app is opened. When there is a new version the gear glows. Tap Download and install and Android’s installer opens – tap Update there. Everything of yours stays.',
+
+  chkNationalityOk: 'Nationality stated', chkNationalityBad: 'No nationality – expected in the Gulf',
+  chkVisaOk: 'Visa status stated', chkVisaBad: 'No visa status (visa/Iqama/QID) – expected in the Gulf',
+  chkAvailabilityOk: 'Availability stated', chkAvailabilityBad: 'No availability – recommended in the Gulf',
+
+  formatSameShort: 'keeps the layout', formatConvertNote: 'The other format is rebuilt as a clean, ATS-safe document. Tables and boxes become paragraphs, images are dropped.',
+
+  regionSection: 'Region', regionLabel: 'Where are you applying?', regionNote: 'Different countries expect different things in a CV. The choice steers how the score is counted.',
+  regionEu: 'Sweden / Europe', regionEuSub: 'No photo, no personal details, 1–2 pages',
+  regionGulf: 'The Gulf states', regionGulfSub: 'Qatar, Saudi Arabia, Oman, UAE, Kuwait, Bahrain',
+  gulfHeading: 'What changes in Gulf mode',
+  gulfPhoto: 'A photo is allowed – it does not cost points. Tables and boxes still do.',
+  gulfPersonal: 'Personal details are checked: nationality, visa/Iqama/QID and availability.',
+  gulfLength: 'Longer CVs are fine – accepted length up to about 1,400 words.',
+  gulfArabic: 'Arabic headings are recognised (الملخص، الخبرة، التعليم، المهارات).',
+  gulfAi: 'The AI tailors the text for a Gulf recruiter.',
+  gulfHonesty: 'The honesty lock applies – only fill in details that are true.',
+
+  protectSection: 'Protection',
+  protectAuth: 'Authenticity check', protectAuthSub: 'The app starts only if it is signed with the developer’s key. A re-signed copy is stopped.',
+  protectCode: 'The code is protected', protectCodeSub: 'Built with R8, which obfuscates the code so the app is hard to decompile.',
+  protectKeys: 'Your keys stay put', protectKeysSub: 'The API key is stored only on the phone and is sent only to Anthropic.',
+  notAuthenticTitle: 'This copy is not authentic', notAuthenticBody: 'ATS is signed with a key other than the developer’s. Install ATS from the real download page. Uninstall this copy first.',
+
+  pickTitle: 'Choose CV', pickFolder: 'Download/ATS',
+  pickAccessTitle: 'Show every CV in the folder', pickAccessBody: 'Give ATS access to Download/ATS once, so files you copy there from a computer or email are listed too.', pickGiveAccess: 'Give access',
+  pickAll: 'All', pickOriginal: 'Original', pickImproved: 'Improved', pickCount: '{n} documents · newest first',
+  improvedBy: 'Improved by ATS', pickBrowse: 'Browse the phone…', pickBrowseSub: 'For a CV in Drive, email or another folder', pickEmpty: 'No CVs in Download/ATS yet.',
+
+  uninstallSection: 'Uninstall', uninstall: 'Uninstall ATS', uninstallSub: 'Back up first if you want',
+  uninstallIntro: 'Before you uninstall, you can back up your settings, scores and saved CVs. The key is never copied.',
+  backupNow: 'Back up to Download/ATS', backupMade: 'Backup saved: {name}', backupShare: 'Share the backup', backupFailed: 'Could not back up: {e}',
+  keepFolderTitle: 'Keep the documents?', keepFolder: 'Keep Download/ATS (default)', keepFolderSub: 'Your saved CVs stay after uninstalling.',
+  deleteAll: 'Delete everything in Download/ATS', deleteAllSub: 'Android asks you to confirm the deletion.',
+  openUninstall: 'Open the uninstaller', restoreTitle: 'Restore from backup', restoreSub: 'Choose an ATS backup (.zip) to get settings and scores back.', restorePick: 'Choose backup', restoreDone: 'Restored from the backup.', restoreFailed: 'Could not restore: {e}',
+
+  previewLabel: 'Preview', fieldNext: 'Next', fieldDone: 'Done',
 };
 
 export const dict: Record<Lang, Strings> = { sv: sv as Strings, en };

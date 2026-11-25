@@ -4,12 +4,13 @@ import { DEMOS, Demo, demoKey } from './demo';
 import { listSaved } from './files';
 import { dateYear } from './dates';
 import { kindOf, Kind } from './core/cv';
+import type { Thumb } from './core/thumb';
 import { useApp } from './store';
 
 export type DocItem = {
   key: string; name: string; kind: Kind; source: 'saved' | 'opened' | 'demo';
   uri?: string; path?: string; demo?: Demo;
-  at: number; score: number | null; photo: boolean; meta: string;
+  at: number; score: number | null; photo: boolean; meta: string; thumb?: Thumb;
 };
 
 export function useDocList(refresh: number) {
@@ -24,7 +25,7 @@ export function useDocList(refresh: number) {
   }, []);
   useEffect(() => { load(); }, [load, refresh]);
 
-  const withScore = (d: DocItem): DocItem => ({ ...d, score: scores[d.key]?.score ?? null });
+  const withScore = (d: DocItem): DocItem => ({ ...d, score: scores[d.key]?.score ?? null, thumb: scores[d.key]?.thumb ?? d.thumb });
   const meta = (d: DocItem) => `${d.kind.toUpperCase()} · ${dateYear(new Date(d.at), lang)}`;
   const items: DocItem[] = [
     ...saved.map(d => ({ ...d, meta: `${meta(d)} · ${t.docSaved}` })),

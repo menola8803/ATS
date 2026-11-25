@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
 import { useApp } from '../store';
-import { H1, Segmented, Sub, TAB_SPACE, Text } from '../ui';
-import { NotTested, Paper, ScoreRing } from '../parts';
+import { PageTitle, Segmented, TAB_SPACE, Text } from '../ui';
+import { CvThumb, NotTested, Paper, ScoreRing } from '../parts';
 import { fill } from '../i18n';
 import { DocItem } from '../library';
 
@@ -13,7 +13,7 @@ export function DocCard({ d, width, onPress }: { d: DocItem; width?: number; onP
     <Pressable accessibilityRole="button" accessibilityLabel={`${d.name}, ${d.score !== null ? d.score : ''}`} onPress={onPress}
       style={({ pressed }) => ({ width, flex: width ? undefined : 1, padding: 8, borderRadius: 16, backgroundColor: theme.card, borderWidth: 1, borderColor: theme.line, opacity: pressed ? 0.85 : 1 })}>
       <View>
-        <Paper photo={d.photo} />
+        {d.thumb ? <CvThumb thumb={d.thumb} /> : <Paper photo={d.photo} />}
         <View style={{ position: 'absolute', top: 6, right: 6 }}>{d.score !== null ? <ScoreRing score={d.score} /> : <NotTested />}</View>
         {d.source === 'demo' ? (
           <View style={{ position: 'absolute', left: 6, bottom: 6, paddingHorizontal: 7, paddingVertical: 2, borderRadius: 8, borderWidth: 1, borderColor: theme.good, backgroundColor: theme.dark ? 'rgba(15,26,28,0.9)' : 'rgba(250,248,244,0.95)' }}>
@@ -29,7 +29,7 @@ export function DocCard({ d, width, onPress }: { d: DocItem; width?: number; onP
 
 type Filter = 'all' | 'tested' | 'not' | 'demo';
 
-export default function Library({ items, demos, onOpen }: { items: DocItem[]; demos: DocItem[]; onOpen: (d: DocItem) => void }) {
+export default function Library({ items, demos, onOpen, onGear, glow }: { items: DocItem[]; demos: DocItem[]; onOpen: (d: DocItem) => void; onGear: () => void; glow: boolean }) {
   const { theme, t } = useApp();
   const [filter, setFilter] = useState<Filter>('all');
   const [help, setHelp] = useState(false);
@@ -46,7 +46,7 @@ export default function Library({ items, demos, onOpen }: { items: DocItem[]; de
   );
   return (
     <ScrollView contentContainerStyle={{ gap: 12, paddingBottom: TAB_SPACE + 12 }} showsVerticalScrollIndicator={false}>
-      <View><H1>{t.myDocs}</H1><Sub>{t.folderName}</Sub></View>
+      <PageTitle title={t.myDocs} sub={t.folderName} onGear={onGear} glow={glow} />
       <Pressable accessibilityRole="button" accessibilityState={{ expanded: help }} onPress={() => setHelp(v => !v)} style={{ alignSelf: 'flex-start', minHeight: 36, justifyContent: 'center' }}>
         <Text style={{ fontSize: 13, fontWeight: '700', color: theme.tabActive }}>{t.badgesHelp}</Text>
       </Pressable>

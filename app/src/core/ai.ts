@@ -1,6 +1,7 @@
 // AI suggestions from Claude, one request for the whole CV. The honesty lock is always on: the prompt forbids new facts,
 // and every suggestion is checked afterwards – a number that is not in the CV becomes a placeholder such as [ANTAL].
 import type { Cv } from './cv';
+import type { Region } from './ats';
 
 export const MODELS = [
   { id: 'claude-haiku-5-5', key: 'fast' },
@@ -25,9 +26,14 @@ const TONE: Record<Tone, string> = {
   persuasive: 'confident and persuasive, but never boastful or exaggerated',
 };
 
-export function systemPrompt(opts: { count: number; tone: Tone; appLang: 'sv' | 'en' }): string {
+export function systemPrompt(opts: { count: number; tone: Tone; appLang: 'sv' | 'en'; region?: Region }): string {
   const why = opts.appLang === 'sv' ? 'Swedish' : 'English';
   const ph = opts.appLang === 'sv' ? '[ANTAL]' : '[NUMBER]';
+  const gulf = opts.region === 'gulf' ? [
+    'This CV is for the Gulf (GCC) job market (e.g. Qatar, Saudi Arabia, Oman, UAE):',
+    '- A photo and personal details (nationality, visa/Iqama/QID status, availability) are expected there. If such a detail is missing and would strengthen the CV, you may suggest adding it as a CAPITALS placeholder, for example [NATIONALITY], [VISA STATUS] or [AVAILABILITY]. Never invent the value.',
+    '- The honesty lock still applies in full: never state a nationality, visa status or availability the CV does not already give.',
+  ] : [];
   return [
     'You improve CVs so that Applicant Tracking Systems (ATS) and recruiters read them well.',
     'HONESTY LOCK – these rules always apply and override everything else:',
@@ -35,6 +41,7 @@ export function systemPrompt(opts: { count: number; tone: Tone; appLang: 'sv' | 
     '- You may reword, restructure, shorten, use stronger verbs and standard terms for what the CV already says.',
     `- If a stronger version needs a detail the CV does not give (a number, a tool, a result), write a placeholder in square brackets in CAPITALS in the paragraph's language, for example ${ph}, [PROCENT], [VERKTYG] or [NUMBER], [PERCENT], [TOOL]. Never guess the value.`,
     '- Words from the job ad may only be used when the CV already shows that the person has that skill or experience.',
+    ...gulf,
     'Other rules:',
     "- Write each suggestion in the same language as the paragraph.",
     '- Keep a list item to one line, and do not make any paragraph much longer than it was.',
@@ -173,12 +180,12 @@ async function withRetry<T>(fn: () => Promise<T>): Promise<T> {
 
 /** Suggestions for the given paragraphs of the CV. */
 export async function suggest(opts: {
-  cv: Cv; ids: number[]; ad?: string; apiKey: string; model: ModelKey; count: number; tone: Tone; appLang: 'sv' | 'en'; f?: typeof fetch; signal?: AbortSignal;
+  cv: Cv; ids: number[]; ad?: string; apiKey: string; model: ModelKey; count: number; tone: Tone; appLang: 'sv' | 'en'; region?: Region; f?: typeof fetch; signal?: AbortSignal;
 }): Promise<ParaAdvice[]> {
   if (!opts.ids.length) return [];
   const all = opts.cv.paras.map(p => p.text).join('\n');
   const byId = new Map(opts.cv.paras.map(p => [p.id, p.text]));
-  const system = systemPrompt({ count: opts.count, tone: opts.tone, appLang: opts.appLang });
+  const system = systemPrompt({ count: opts.count, tone: opts.tone, appLang: opts.appLang, region: opts.region });
   const out: ParaAdvice[] = [];
   for (const ids of chunk(opts.ids, BATCH)) {
     const answer = await withRetry(() => askClaude({

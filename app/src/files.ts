@@ -49,6 +49,18 @@ export async function saveToDownloads(name: string, kind: Kind, bytes: Uint8Arra
   return AtsNativeModule.saveDownload(name, toBase64(bytes), MIME[kind]);
 }
 
+/** Saves any file (e.g. a backup .zip) in Download/ATS. */
+export async function saveBytesToDownloads(name: string, mime: string, bytes: Uint8Array): Promise<{ uri: string; name: string }> {
+  if (Platform.OS !== 'android' || !AtsNativeModule) throw new Error('android');
+  return AtsNativeModule.saveDownload(name, toBase64(bytes), mime);
+}
+
+/** Best-effort delete of the CVs ATS saved in Download/ATS. Returns how many were removed. */
+export async function deleteSaved(): Promise<number> {
+  if (!AtsNativeModule) return 0;
+  try { return await AtsNativeModule.deleteDownloads(); } catch { return 0; }
+}
+
 export async function listSaved(): Promise<DownloadFile[]> {
   if (!AtsNativeModule) return [];
   try { return await AtsNativeModule.listDownloads(); } catch { return []; }
@@ -60,6 +72,14 @@ export async function shareDoc(name: string, kind: Kind, bytes: Uint8Array) {
   f.create({ intermediates: true, overwrite: true });
   await f.write(bytes);
   await Sharing.shareAsync(f.uri, { mimeType: MIME[kind], dialogTitle: name });
+}
+
+/** Opens the share sheet with any bytes (e.g. a backup .zip). */
+export async function shareBytes(name: string, mime: string, bytes: Uint8Array) {
+  const f = new File(Paths.cache, name);
+  f.create({ intermediates: true, overwrite: true });
+  await f.write(bytes);
+  await Sharing.shareAsync(f.uri, { mimeType: mime, dialogTitle: name });
 }
 
 /** Opens a saved document in another app (Word, LibreOffice, Google Docs …). */

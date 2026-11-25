@@ -12,7 +12,7 @@ import { AppProvider, useApp } from './src/store';
 import { DocProvider, useDoc } from './src/session';
 import { DialogHost, showDialog } from './src/dialog';
 import { Route } from './src/nav';
-import { Screen, TabBar, TabName } from './src/ui';
+import { AtsMark, Screen, TabBar, TabName, Text, useKeyboardOpen } from './src/ui';
 import { isNewer, latestRelease } from './src/update';
 import { DocItem, useDocList } from './src/library';
 import { DEMOS, demoKey } from './src/demo';
@@ -22,9 +22,10 @@ import Splash from './src/screens/Splash';
 import Home from './src/screens/Home';
 import Evaluate from './src/screens/Evaluate';
 import Library from './src/screens/Library';
+import Picker from './src/screens/Picker';
 import Save from './src/screens/Save';
 import Compare from './src/screens/Compare';
-import Settings, { ManualScreen, PrivacyScreen, UpdateScreen } from './src/screens/Settings';
+import Settings, { ManualScreen, PrivacyScreen, UninstallScreen, UpdateScreen } from './src/screens/Settings';
 
 const UPDATE_EVERY = 6 * 3600 * 1000;
 
@@ -40,6 +41,7 @@ function Content() {
   const toTabs = useCallback((k: TabName) => { setStack([{ name: 'tabs' }]); setTab(k); }, []);
   const version = Constants.expoConfig?.version ?? '0.0.0';
   const glow = !!updateTag && isNewer(updateTag, version);
+  const keyboardOpen = useKeyboardOpen();
 
   // ATS is open: the "ATS is updated" notification is not needed any more.
   useEffect(() => { try { AtsNativeModule?.clearUpdateNotice(); } catch {} }, []);
@@ -115,23 +117,27 @@ function Content() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session, addRecent, toTabs, t]);
 
+  const toSettings = () => push({ name: 'settings' });
+  const toPicker = () => push({ name: 'picker' });
   const r = stack[stack.length - 1];
   switch (r.name) {
     case 'save': return <Save onBack={pop} onCompare={() => push({ name: 'compare' })} />;
     case 'compare': return <Compare onBack={pop} onImprove={() => toTabs('eval')} />;
+    case 'picker': return <Picker items={items} onOpen={d => { pop(); openItem(d); }} onBrowse={() => { pop(); pick(); }} onBack={pop} />;
+    case 'settings': return <Settings onBack={pop} go={name => push({ name })} glow={glow} />;
     case 'manual': return <ManualScreen onBack={pop} />;
     case 'privacy': return <PrivacyScreen onBack={pop} />;
+    case 'uninstall': return <UninstallScreen onBack={pop} />;
     case 'update': return <UpdateScreen onBack={pop} auto={r.auto} />;
     default:
       return (
         <Screen bottom={false}>
           <View style={{ flex: 1 }}>
-            {tab === 'home' && <Home items={items} onEvaluate={pick} onOpen={openItem} onAllDocs={() => setTab('docs')} onGear={() => setTab('settings')} glow={glow} />}
-            {tab === 'eval' && <Evaluate onPick={pick} onDemo={openDemo} onSave={() => push({ name: 'save' })} onSettings={() => setTab('settings')} />}
-            {tab === 'docs' && <Library items={items} demos={demos} onOpen={openItem} />}
-            {tab === 'settings' && <Settings go={name => push({ name })} glow={glow} />}
+            {tab === 'home' && <Home items={items} onEvaluate={toPicker} onOpen={openItem} onAllDocs={() => setTab('docs')} onGear={toSettings} glow={glow} />}
+            {tab === 'eval' && <Evaluate onPick={toPicker} onDemo={openDemo} onSave={() => push({ name: 'save' })} onSettings={toSettings} />}
+            {tab === 'docs' && <Library items={items} demos={demos} onOpen={openItem} onGear={toSettings} glow={glow} />}
           </View>
-          <TabBar tab={tab} setTab={setTab} glow={glow} />
+          {!keyboardOpen && <TabBar tab={tab} setTab={setTab} />}
         </Screen>
       );
   }
@@ -145,13 +151,28 @@ function Root() {
     PlusJakartaSans_400Regular, PlusJakartaSans_500Medium, PlusJakartaSans_600SemiBold, PlusJakartaSans_700Bold, PlusJakartaSans_800ExtraBold, Cinzel_700Bold,
   });
   const [splashDone, setSplashDone] = useState(false);
+  // The app is signed with the developer's key. A re-signed copy (e.g. one with a hidden change) is stopped.
+  const [authentic, setAuthentic] = useState(true);
+  useEffect(() => { try { setAuthentic(AtsNativeModule?.isAuthentic?.() ?? true); } catch {} }, []);
   if (!ready || !fontsLoaded) return <View style={{ flex: 1, backgroundColor: '#0B1416' }} />;
+  if (!authentic) return <NotAuthentic />;
   return (
     <View style={{ flex: 1, backgroundColor: theme.bg }}>
       <StatusBar style={theme.dark ? 'light' : 'dark'} />
       <DocProvider><Content /></DocProvider>
       {!splashDone && <Splash onDone={() => setSplashDone(true)} />}
       <DialogHost />
+    </View>
+  );
+}
+
+function NotAuthentic() {
+  const { t, theme } = useApp();
+  return (
+    <View style={{ flex: 1, backgroundColor: theme.bg, alignItems: 'center', justifyContent: 'center', padding: 28, gap: 14 }}>
+      <AtsMark size={96} />
+      <Text style={{ fontSize: 20, fontWeight: '700', color: theme.ink, textAlign: 'center' }}>{t.notAuthenticTitle}</Text>
+      <Text style={{ fontSize: 15, lineHeight: 22, color: theme.muted, textAlign: 'center' }}>{t.notAuthenticBody}</Text>
     </View>
   );
 }

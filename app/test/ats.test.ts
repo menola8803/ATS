@@ -19,4 +19,17 @@ ok(j.keywords!.missing.includes('windows'), 'Jonas misses Windows from the ad');
 ok(candidates(mira).length > 5 && !candidates(mira).some(id => mira.paras[id].heading), 'candidates are text, not headings');
 ok(!adKeywords('Vi söker dig som har erfarenhet och arbetar i team').includes('söker'), 'filler words are not keywords');
 ok(matchAd('Jag är utvecklaren', 'utvecklare').pct === 100, 'longer form of a word counts');
+
+// Gulf region: a photo is not held against the score, and personal-detail checks are added.
+const jGulf = evaluate(jonas, ad('jonas'), 'gulf');
+ok(jGulf.region === 'gulf', 'region is reported');
+ok(jGulf.checks.some(c => c.id === 'nationality') && jGulf.checks.some(c => c.id === 'visa'), 'Gulf adds personal-detail checks');
+ok(jGulf.checks.find(c => c.id === 'images')!.points === 0, 'Gulf does not penalise a photo');
+// A photo lowers the EU base but not the Gulf base.
+const withPhoto = { ...mira, layout: { ...mira.layout, images: 1 } };
+ok(evaluate(withPhoto, undefined, 'eu').base === evaluate(mira, undefined, 'eu').base - 10, 'a photo costs 10 in the EU');
+ok(evaluate(withPhoto, undefined, 'gulf').base === evaluate(mira, undefined, 'gulf').base, 'a photo costs nothing in the Gulf');
+const visaCv = readCv('docx', unzip(demo('Demo_Mira_Andersson_CV.docx')));
+ok(evaluate({ ...visaCv, paras: [...visaCv.paras, { ...visaCv.paras[0], id: 999, text: 'Nationality: Swedish, transferable QID visa, available immediately' }] }, undefined, 'gulf')
+  .checks.filter(c => ['nationality', 'visa', 'availability'].includes(c.id)).every(c => c.ok), 'Gulf personal details are detected');
 done('ats');

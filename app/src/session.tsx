@@ -3,6 +3,8 @@ import React, { createContext, useCallback, useContext, useMemo, useRef, useStat
 import { Cv, Kind, readCv, writeCv } from './core/cv';
 import { evaluate, candidates, Score } from './core/ats';
 import { ApiError, ParaAdvice, PLACEHOLDERS, suggest } from './core/ai';
+import { buildThumb, Thumb } from './core/thumb';
+import { convertClean } from './core/convert';
 import { unzip, zip } from './core/zip';
 import { filledText as filled } from './core/fill';
 import { useApp } from './store';
@@ -31,7 +33,9 @@ type Ctx = {
   edits: () => Record<number, string>;
   unfilled: () => number;                // paragraphs that still have a placeholder
   after: Score | null;                   // the score with the chosen suggestions
-  build: () => Uint8Array;               // the improved file
+  build: () => Uint8Array;               // the improved file, in the original format
+  buildAs: (kind: Kind) => Uint8Array;   // the improved file; a different format is rebuilt clean
+  thumb: () => Thumb | undefined;        // a page miniature of the improved document
 };
 const C = createContext<Ctx>(null as unknown as Ctx);
 export const useDoc = () => useContext(C);
@@ -49,10 +53,10 @@ export function DocProvider({ children }: { children: React.ReactNode }) {
     abort.current?.abort();
     const cv = readCv(o.kind, unzip(bytes));
     const ad = o.demoAd ?? (app.useAd ? app.ad : '');
-    const before = evaluate(cv, ad || undefined);
+    const before = evaluate(cv, ad || undefined, app.region);
     const d: OpenDoc = { key: o.key, name: o.name, kind: o.kind, demo: o.demo, cv, ad, adIsDemo: !!o.demoAd, before, advice: null, picked: {}, fills: {} };
     setDoc(d); setError(null); setErrorText(''); setBusy(false);
-    app.setScore(o.key, before.score);
+    app.setScore(o.key, before.score, buildThumb(cv));
     return d;
   }, [app]);
 
@@ -65,7 +69,7 @@ export function DocProvider({ children }: { children: React.ReactNode }) {
     try {
       const list = await suggest({
         cv: doc.cv, ids: candidates(doc.cv), ad: doc.adIsDemo || app.useAd ? doc.ad : undefined, apiKey: app.apiKey,
-        model: app.model, count: app.count, tone: app.tone, appLang: app.lang, signal: ctl.signal,
+        model: app.model, count: app.count, tone: app.tone, appLang: app.lang, region: app.region, signal: ctl.signal,
       });
       if (ctl.signal.aborted) return;
       const advice: Record<number, ParaAdvice> = {};
@@ -120,16 +124,29 @@ export function DocProvider({ children }: { children: React.ReactNode }) {
     const e = editsOf(doc);
     if (!Object.keys(e).length) return null;
     const cv: Cv = { ...doc.cv, paras: doc.cv.paras.map(p => (e[p.id] !== undefined ? { ...p, text: e[p.id] } : p)) };
-    return evaluate(cv, doc.ad || undefined);
-  }, [doc, editsOf]);
+    return evaluate(cv, doc.ad || undefined, app.region);
+  }, [doc, editsOf, app.region]);
 
   const build = useCallback(() => {
     if (!doc) throw new Error('no document');
     return zip(writeCv(doc.cv, editsOf(doc)), doc.kind);
   }, [doc, editsOf]);
 
+  // Same format keeps the original layout; the other format is rebuilt as a clean ATS-safe document.
+  const buildAs = useCallback((kind: Kind) => {
+    if (!doc) throw new Error('no document');
+    return kind === doc.kind ? zip(writeCv(doc.cv, editsOf(doc)), doc.kind) : convertClean(kind, doc.cv, editsOf(doc));
+  }, [doc, editsOf]);
+
+  const thumb = useCallback(() => {
+    if (!doc) return undefined;
+    const e = editsOf(doc);
+    const cv: Cv = { ...doc.cv, paras: doc.cv.paras.map(p => (e[p.id] !== undefined ? { ...p, text: e[p.id] } : p)) };
+    return buildThumb(cv);
+  }, [doc, editsOf]);
+
   const value = useMemo<Ctx>(() => ({
-    doc, busy, error, errorText, open, close, fetchAdvice, pick, unpick, setFill, useAllFirst, textOf, edits, unfilled, after, build,
-  }), [doc, busy, error, errorText, open, close, fetchAdvice, pick, unpick, setFill, useAllFirst, textOf, edits, unfilled, after, build]);
+    doc, busy, error, errorText, open, close, fetchAdvice, pick, unpick, setFill, useAllFirst, textOf, edits, unfilled, after, build, buildAs, thumb,
+  }), [doc, busy, error, errorText, open, close, fetchAdvice, pick, unpick, setFill, useAllFirst, textOf, edits, unfilled, after, build, buildAs, thumb]);
   return <C.Provider value={value}>{children}</C.Provider>;
 }
