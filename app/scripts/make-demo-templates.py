@@ -1,6 +1,29 @@
 # -*- coding: utf-8 -*-
 from docx import Document
-from docx.shared import Pt, RGBColor
+from docx.shared import Pt, RGBColor, Inches
+from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.oxml.ns import qn
+from docx.oxml import OxmlElement
+from PIL import Image, ImageDraw
+
+AVATAR = '/tmp/ats_avatar.png'
+
+def make_avatar():
+    w, h = 300, 360
+    img = Image.new('RGB', (w, h), (219, 228, 230))
+    dr = ImageDraw.Draw(img)
+    dr.ellipse((95, 70, 205, 180), fill=(138, 154, 158))          # head
+    dr.pieslice((55, 210, 245, 430), 180, 360, fill=(138, 154, 158))  # shoulders
+    img.save(AVATAR)
+
+def gold_rule(p):
+    pPr = p._p.get_or_add_pPr()
+    pBdr = OxmlElement('w:pBdr')
+    bottom = OxmlElement('w:bottom')
+    for k, v in (('w:val', 'single'), ('w:sz', '6'), ('w:space', '2'), ('w:color', 'C9A04A')):
+        bottom.set(qn(k), v)
+    pBdr.append(bottom)
+    pPr.append(pBdr)
 
 def style_headings(doc):
     for lvl, size in (('Title', 20), ('Heading 1', 20), ('Heading 2', 11)):
@@ -10,12 +33,17 @@ def style_headings(doc):
         except KeyError:
             pass
 
+def photo(doc):
+    p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    p.add_run().add_picture(AVATAR, width=Inches(1.15))
+
 def name(doc, text, role):
     doc.add_heading(text, level=0)
     p = doc.add_paragraph(); r = p.add_run(role); r.bold = True
     r.font.size = Pt(11); r.font.color.rgb = RGBColor(0xB0, 0x84, 0x2C)
 
-def head(doc, t): doc.add_heading(t, level=2)
+def head(doc, t):
+    gold_rule(doc.add_heading(t, level=2))
 def para(doc, t): doc.add_paragraph(t)
 def bullet(doc, t): doc.add_paragraph('• ' + t)
 def jobline(doc, t):
@@ -44,14 +72,16 @@ head(d, 'UTBILDNING')
 jobline(d, 'Logistik och ledarskap, Yrkeshögskolan Västerås · 2014–2016')
 jobline(d, 'Certifierad projektledare, Projektledarakademin · 2020')
 head(d, 'KOMPETENSER')
-para(d, 'Projektledning · Logistik · Lagersystem (WMS) · Budget och uppföljning · Förändringsledning · Leverantörskontakt · Excel · Arbetsmiljö · Agila metoder · Riskanalys \u00b7 Lean \u00b7 Kaizen \u00b7 Ledarskap \u00b7 Kommunikation \u00b7 Kvalitetsarbete')
+para(d, 'Projektledning · Logistik · Lagersystem (WMS) · Budget och uppföljning · Förändringsledning · Leverantörskontakt · Excel · Arbetsmiljö · Agila metoder · Riskanalys · Lean · Kaizen · Ledarskap · Kommunikation · Kvalitetsarbete')
 head(d, 'SPRÅK OCH ÖVRIGT')
 para(d, 'Svenska (modersmål) · Engelska (flytande) · B-körkort · Truckkort A och B')
 para(d, 'Exempelmall från ATS-appen. Personen är påhittad.')
 d.save('assets/demo/Demo_Elin_Ek_Mall.docx')
 
 # ---------------- Omar Haddad (Gulf, EN) ----------------
+make_avatar()
 d = Document(); style_headings(d)
+photo(d)
 name(d, 'Omar Haddad', 'Mechanical Engineer · Oil and Gas')
 para(d, 'omar.haddad@examplemail.com · +974 5012 3456 · Doha, Qatar')
 para(d, 'Nationality: Jordanian · Visa status: Transferable QID (work visa) · Available to join: immediately · Date of birth: 14 Mar 1990 · Marital status: Married')
@@ -73,6 +103,6 @@ head(d, 'SKILLS')
 para(d, 'Maintenance · Shutdown planning · Rotating equipment · HSE · Project management · Root-cause analysis · SAP PM · Vendor management · Team leadership · Turnaround planning')
 head(d, 'LANGUAGES AND OTHER')
 para(d, 'Arabic (native) · English (fluent) · Qatar driving licence')
-para(d, 'Example template from the ATS app. The person is fictional. A photo can be added for the Gulf market.')
+para(d, 'Example template from the ATS app. The person is fictional. Replace the photo with your own.')
 d.save('assets/demo/Demo_Omar_Haddad_Mall_Gulf.docx')
 print('generated')

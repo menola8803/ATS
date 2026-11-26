@@ -1,5 +1,8 @@
 # What's new in ATS
 
+## 0.1.12
+- The Gulf template (Omar Haddad) gets its nice design back: a photo at the top, a coloured title and petrol headings with thin gold lines. The Swedish template also gets gold lines under its headings. The photo costs no points in Gulf mode (but counts as an image in Sweden/Europe mode).
+
 ## 0.1.11
 - Edit a suggestion before you use it: tap Edit on a paragraph and adjust the text by hand – your version wins and the score updates.
 - Regenerate a single paragraph: tap Regenerate for fresh suggestions on just that paragraph, without re-running the whole CV.

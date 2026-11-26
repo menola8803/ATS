@@ -41,7 +41,9 @@ ok(elinScore.checks.find(c => c.id === 'linkedin')!.ok === false, 'Elin template
 
 const omar = readCv('docx', unzip(demo('Demo_Omar_Haddad_Mall_Gulf.docx')));
 const omarScore = evaluate(omar, undefined, 'gulf');
-ok(omar.layout.tables === 0 && omar.layout.images === 0 && omar.layout.textBoxes === 0, 'Omar Gulf template is ATS-clean');
+ok(omar.layout.tables === 0 && omar.layout.textBoxes === 0, 'Omar Gulf template has no tables or boxes');
+ok(omar.layout.images === 1, 'Omar Gulf template includes a photo (fine in Gulf mode)');
 ok(omarScore.score >= 95 && omarScore.score < 100, `Omar Gulf template scores ~95 in Gulf mode (got ${omarScore.score})`);
+ok(omarScore.checks.find(c => c.id === 'images')!.ok === true, 'the photo is not held against the Gulf score');
 ok(omarScore.checks.filter(c => ['nationality', 'visa'].includes(c.id)).every(c => c.ok), 'Omar template states nationality and visa status');
 done('ats');

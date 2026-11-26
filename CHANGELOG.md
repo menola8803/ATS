@@ -1,5 +1,8 @@
 # Nyheter i ATS
 
+## 0.1.12
+- Gulf-mallen (Omar Haddad) har fått tillbaka den fina designen: foto högst upp, färgad titel och petrolrubriker med tunna guldlinjer. Den svenska mallen har också fått guldlinjer under rubrikerna. Fotot drar inga poäng i Gulf-läget (men räknas som en bild i Sverige/Europa-läget).
+
 ## 0.1.11
 - Redigera ett förslag innan du använder det: tryck Redigera på ett stycke och justera texten för hand – din version vinner och poängen uppdateras.
 - Gör om ett enskilt stycke: tryck Gör om för nya förslag på just det stycket, utan att hämta om hela CV:t.
