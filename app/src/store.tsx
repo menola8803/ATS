@@ -9,7 +9,7 @@ import type { Region } from './core/ats';
 import type { Thumb } from './core/thumb';
 
 // Unfinished work on a document: the AI suggestions and the choices made, so the person can carry on later.
-export type Draft = { advice: Record<number, ParaAdvice>; picked: Record<number, number>; fills: Record<number, string[]>; at: number };
+export type Draft = { advice: Record<number, ParaAdvice>; picked: Record<number, number>; fills: Record<number, string[]>; override?: Record<number, string>; at: number };
 
 /** A document the person has opened (a private copy is kept in the app, so it can be opened again). */
 export type Recent = { key: string; name: string; kind: Kind; path: string; at: number };
@@ -30,6 +30,7 @@ type Saved = {
   recent: Recent[];
   updateTag: string; updateChecked: number; updateAuto: boolean;
   folderMade: boolean;        // Download/ATS has been created
+  demosCopied: boolean;       // the bundled demos/templates have been copied to Download/ATS/Demo
 };
 
 const KEY = 'ats.state.v1';
@@ -38,7 +39,7 @@ const MAX_RECENT = 40;
 
 const empty = (): Saved => ({
   themeName: 'dark', lang: 'en', model: 'fast', count: 2, tone: 'neutral', useAd: true, showDemo: true, region: 'eu', linkedin: { summary: '', experience: '' }, ad: '',
-  scores: {}, drafts: {}, recent: [], updateTag: '', updateChecked: 0, updateAuto: true, folderMade: false,
+  scores: {}, drafts: {}, recent: [], updateTag: '', updateChecked: 0, updateAuto: true, folderMade: false, demosCopied: false,
 });
 
 type Prefs = Omit<Saved, 'scores' | 'recent'>;

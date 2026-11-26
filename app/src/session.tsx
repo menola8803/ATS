@@ -18,6 +18,7 @@ export type OpenDoc = {
   advice: Record<number, ParaAdvice> | null;
   picked: Record<number, number>;        // paragraph id -> chosen suggestion
   fills: Record<number, string[]>;       // paragraph id -> what the person typed for each placeholder
+  override: Record<number, string>;      // paragraph id -> text the person edited by hand (wins over the suggestion)
 };
 
 type Ctx = {
@@ -29,6 +30,8 @@ type Ctx = {
   pick: (id: number, i: number) => void;
   unpick: (id: number) => void;
   setFill: (id: number, n: number, v: string) => void;
+  setOverride: (id: number, text: string) => void;  // the person edits the chosen text by hand
+  regenerate: (id: number) => Promise<void>;         // ask the AI for fresh suggestions for one paragraph
   useAllFirst: () => void;
   textOf: (id: number) => string;        // the paragraph as it is now (original or chosen suggestion, placeholders filled)
   edits: () => Record<number, string>;
@@ -60,7 +63,7 @@ export function DocProvider({ children }: { children: React.ReactNode }) {
     // Carry on from unfinished work on this document, if there is any.
     const draft = app.drafts[o.key];
     const d: OpenDoc = { key: o.key, name: o.name, kind: o.kind, demo: o.demo, cv, ad, adIsDemo: !!o.demoAd, before,
-      advice: draft?.advice ?? null, picked: draft?.picked ?? {}, fills: draft?.fills ?? {} };
+      advice: draft?.advice ?? null, picked: draft?.picked ?? {}, fills: draft?.fills ?? {}, override: draft?.override ?? {} };
     setDoc(d); setError(null); setErrorText(''); setBusy(false);
     app.setScore(o.key, before.score, buildThumb(cv));
     return d;
@@ -68,7 +71,7 @@ export function DocProvider({ children }: { children: React.ReactNode }) {
 
   // Keep the unfinished work saved, so the person can leave and carry on later. Cleared when they save the improved file.
   useEffect(() => {
-    if (doc?.advice) app.setDraft(doc.key, { advice: doc.advice, picked: doc.picked, fills: doc.fills, at: Date.now() });
+    if (doc?.advice) app.setDraft(doc.key, { advice: doc.advice, picked: doc.picked, fills: doc.fills, override: doc.override, at: Date.now() });
   }, [doc]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const close = useCallback(() => { abort.current?.abort(); setDoc(null); setBusy(false); }, []);
@@ -85,7 +88,7 @@ export function DocProvider({ children }: { children: React.ReactNode }) {
       if (ctl.signal.aborted) return;
       const advice: Record<number, ParaAdvice> = {};
       for (const a of list) advice[a.id] = a;
-      setDoc(d => (d && d.key === doc.key ? { ...d, advice, picked: {}, fills: {} } : d));
+      setDoc(d => (d && d.key === doc.key ? { ...d, advice, picked: {}, fills: {}, override: {} } : d));
     } catch (e) {
       if (ctl.signal.aborted) return;
       const kind = ((e as any)?.kind as ApiError) ?? (e instanceof SyntaxError ? 'answer' : 'other');
@@ -95,18 +98,53 @@ export function DocProvider({ children }: { children: React.ReactNode }) {
     }
   }, [doc, busy, app]);
 
-  const pick = useCallback((id: number, i: number) => setDoc(d => (d ? { ...d, picked: { ...d.picked, [id]: i }, fills: { ...d.fills, [id]: [] } } : d)), []);
+  const pick = useCallback((id: number, i: number) => setDoc(d => {
+    if (!d) return d;
+    const override = { ...d.override }; delete override[id]; // a fresh choice drops a hand edit
+    return { ...d, picked: { ...d.picked, [id]: i }, fills: { ...d.fills, [id]: [] }, override };
+  }), []);
   const unpick = useCallback((id: number) => setDoc(d => {
     if (!d) return d;
     const picked = { ...d.picked }; delete picked[id];
     const fills = { ...d.fills }; delete fills[id];
-    return { ...d, picked, fills };
+    const override = { ...d.override }; delete override[id];
+    return { ...d, picked, fills, override };
   }), []);
   const setFill = useCallback((id: number, n: number, v: string) => setDoc(d => {
     if (!d) return d;
     const arr = [...(d.fills[id] ?? [])]; arr[n] = v;
     return { ...d, fills: { ...d.fills, [id]: arr } };
   }), []);
+  const setOverride = useCallback((id: number, text: string) => setDoc(d => (d ? { ...d, override: { ...d.override, [id]: text } } : d)), []);
+
+  // Fresh suggestions for a single paragraph, without re-running the whole CV.
+  const regenerate = useCallback(async (id: number) => {
+    if (!doc || busy) return;
+    setBusy(true); setError(null); setErrorText('');
+    const ctl = new AbortController(); abort.current = ctl;
+    try {
+      const list = await suggest({
+        cv: doc.cv, ids: [id], ad: doc.adIsDemo || app.useAd ? doc.ad : undefined, apiKey: app.apiKey,
+        model: app.model, count: app.count, tone: app.tone, appLang: app.lang, region: app.region, signal: ctl.signal,
+      });
+      if (ctl.signal.aborted) return;
+      const a = list.find(x => x.id === id);
+      setDoc(d => {
+        if (!d || d.key !== doc.key) return d;
+        const advice = { ...(d.advice ?? {}) }; if (a) advice[id] = a;
+        const picked = { ...d.picked }; delete picked[id];
+        const fills = { ...d.fills }; delete fills[id];
+        const override = { ...d.override }; delete override[id];
+        return { ...d, advice, picked, fills, override };
+      });
+    } catch (e) {
+      if (ctl.signal.aborted) return;
+      const kind = ((e as any)?.kind as ApiError) ?? (e instanceof SyntaxError ? 'answer' : 'other');
+      setError(kind); setErrorText((e as Error)?.message ?? '');
+    } finally {
+      if (!ctl.signal.aborted) setBusy(false);
+    }
+  }, [doc, busy, app]);
   const useAllFirst = useCallback(() => setDoc(d => {
     if (!d?.advice) return d;
     const picked = { ...d.picked };
@@ -119,6 +157,9 @@ export function DocProvider({ children }: { children: React.ReactNode }) {
     for (const [k, i] of Object.entries(d.picked)) {
       const id = Number(k), s = d.advice?.[id]?.suggestions[i];
       if (s) out[id] = filled(s.text, d.fills[id]);
+    }
+    for (const [k, txt] of Object.entries(d.override)) {
+      if (txt.trim()) out[Number(k)] = txt; // a hand edit wins over the chosen suggestion
     }
     return out;
   }, []);
@@ -165,11 +206,11 @@ export function DocProvider({ children }: { children: React.ReactNode }) {
   const discard = useCallback(() => {
     if (!doc) return;
     app.clearDraft(doc.key);
-    setDoc(d => (d ? { ...d, advice: null, picked: {}, fills: {} } : d));
+    setDoc(d => (d ? { ...d, advice: null, picked: {}, fills: {}, override: {} } : d));
   }, [doc, app]);
 
   const value = useMemo<Ctx>(() => ({
-    doc, busy, error, errorText, open, close, fetchAdvice, pick, unpick, setFill, useAllFirst, textOf, edits, unfilled, after, build, buildAs, pdf, thumb, discard,
-  }), [doc, busy, error, errorText, open, close, fetchAdvice, pick, unpick, setFill, useAllFirst, textOf, edits, unfilled, after, build, buildAs, pdf, thumb, discard]);
+    doc, busy, error, errorText, open, close, fetchAdvice, pick, unpick, setFill, setOverride, regenerate, useAllFirst, textOf, edits, unfilled, after, build, buildAs, pdf, thumb, discard,
+  }), [doc, busy, error, errorText, open, close, fetchAdvice, pick, unpick, setFill, setOverride, regenerate, useAllFirst, textOf, edits, unfilled, after, build, buildAs, pdf, thumb, discard]);
   return <C.Provider value={value}>{children}</C.Provider>;
 }

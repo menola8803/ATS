@@ -16,7 +16,7 @@ import { AtsMark, Screen, TabBar, TabName, Text, useKeyboardOpen } from './src/u
 import { isNewer, latestRelease } from './src/update';
 import { DocItem, useDocList } from './src/library';
 import { DEMOS, demoKey } from './src/demo';
-import { keepCopy, readDemo, readUri } from './src/files';
+import { copyDemo, keepCopy, readDemo, readUri } from './src/files';
 import { kindOf } from './src/core/cv';
 import Splash from './src/screens/Splash';
 import Home from './src/screens/Home';
@@ -31,7 +31,7 @@ import Settings, { ManualScreen, PrivacyScreen, UninstallScreen, UpdateScreen } 
 const UPDATE_EVERY = 6 * 3600 * 1000;
 
 function Content() {
-  const { ready, updateTag, updateChecked, updateAuto, folderMade, setPrefs, addRecent, removeRecent, t } = useApp();
+  const { ready, updateTag, updateChecked, updateAuto, folderMade, demosCopied, setPrefs, addRecent, removeRecent, t } = useApp();
   const session = useDoc();
   const [stack, setStack] = useState<Route[]>([{ name: 'tabs' }]);
   const [tab, setTab] = useState<TabName>('home');
@@ -52,6 +52,17 @@ function Content() {
     AtsNativeModule.makeFolder(t.folderNote).then(ok => { if (ok) setPrefs({ folderMade: true }); }).catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready]);
+  // Copy the bundled demos and templates into Download/ATS/Demo once, so they are also real files on the phone.
+  useEffect(() => {
+    if (!ready || demosCopied || !AtsNativeModule) return;
+    (async () => {
+      try {
+        for (const d of DEMOS) { const bytes = await readDemo(d); await copyDemo(d.name, d.kind, bytes); }
+        setPrefs({ demosCopied: true });
+      } catch {}
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, demosCopied]);
   // Look for a new version now and then; the gear glows when there is one.
   useEffect(() => {
     if (!ready || !updateAuto || Date.now() - updateChecked < UPDATE_EVERY) return;

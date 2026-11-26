@@ -150,6 +150,11 @@ const sv = {
   liCopy: 'Kopiera', liCopied: 'Kopierad', liEmpty: 'Klistra in text först.',
   liLockOn: 'Ärlighetsspärr på · AI:n lägger aldrig till fakta som inte finns i din text.',
 
+  // keywords + edit/regenerate
+  kwMissingTap: 'Saknade ord från annonsen. Lägg in dem där de stämmer. Tryck för att kopiera.',
+  kwFound: 'Finns redan: {w}',
+  editText: 'Redigera', editDone: 'Klar', editLabel: 'Din text', regenerateOne: 'Gör om',
+
   // already-perfect feedback
   scoreMaxTitle: 'Strukturen är redan på topp',
   scoreMaxBody: 'Poängen mäter struktur och nyckelord, och mer än 100 går inte. Förslagen gör texten vassare för rekryteraren som läser, även om siffran står still.',
@@ -330,6 +335,10 @@ const en: Strings = {
   liOriginal: 'Original', liImproved: 'Improved', liVariant: 'Version {n} of {m}', liNext: 'Next version',
   liCopy: 'Copy', liCopied: 'Copied', liEmpty: 'Paste some text first.',
   liLockOn: 'Honesty lock on · the AI never adds facts that are not in your text.',
+
+  kwMissingTap: 'Words from the ad that are missing. Add them where they are true. Tap to copy.',
+  kwFound: 'Already there: {w}',
+  editText: 'Edit', editDone: 'Done', editLabel: 'Your text', regenerateOne: 'Regenerate',
 
   scoreMaxTitle: 'The structure is already at the top',
   scoreMaxBody: 'The score measures structure and keywords, and 100 is the ceiling. The suggestions sharpen the wording for the recruiter who reads it, even though the number stays put.',

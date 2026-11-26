@@ -55,6 +55,12 @@ export async function saveBytesToDownloads(name: string, mime: string, bytes: Ui
   return AtsNativeModule.saveDownload(name, toBase64(bytes), mime);
 }
 
+/** Copies a bundled demo/template into Download/ATS/Demo once. Best effort; returns true if it was written. */
+export async function copyDemo(name: string, kind: Kind, bytes: Uint8Array): Promise<boolean> {
+  if (!AtsNativeModule) return false;
+  try { return await AtsNativeModule.saveDemo(name, toBase64(bytes), MIME[kind]); } catch { return false; }
+}
+
 /** Best-effort delete of the CVs ATS saved in Download/ATS. Returns how many were removed. */
 export async function deleteSaved(): Promise<number> {
   if (!AtsNativeModule) return 0;

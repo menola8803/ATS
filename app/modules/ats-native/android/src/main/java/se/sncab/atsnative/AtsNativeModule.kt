@@ -54,6 +54,33 @@ class AtsNativeModule : Module() {
   override fun definition() = ModuleDefinition {
     Name("AtsNative")
 
+    // Saves a file into Download/ATS/Demo, skipping it when a file with that name is already there,
+    // so the bundled demos and templates are copied once without piling up duplicates.
+    AsyncFunction("saveDemo") { name: String, base64: String, mime: String ->
+      if (Build.VERSION.SDK_INT < 29) throw Exception("android10")
+      val r = ctx.contentResolver
+      val sub = "$folder/Demo"
+      val exists = r.query(MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL), arrayOf(MediaStore.MediaColumns._ID),
+        "${MediaStore.MediaColumns.RELATIVE_PATH} LIKE ? AND ${MediaStore.MediaColumns.DISPLAY_NAME} = ?", arrayOf("$sub/%", name), null)
+        ?.use { it.moveToFirst() } ?: false
+      if (exists) return@AsyncFunction false
+      val values = ContentValues().apply {
+        put(MediaStore.Downloads.DISPLAY_NAME, name)
+        put(MediaStore.Downloads.MIME_TYPE, mime)
+        put(MediaStore.Downloads.RELATIVE_PATH, sub)
+        put(MediaStore.Downloads.IS_PENDING, 1)
+      }
+      val uri = r.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values) ?: throw Exception("insert failed")
+      try {
+        r.openOutputStream(uri)?.use { it.write(Base64.decode(base64, Base64.DEFAULT)) } ?: throw Exception("no stream")
+        r.update(uri, ContentValues().apply { put(MediaStore.Downloads.IS_PENDING, 0) }, null, null)
+      } catch (e: Exception) {
+        try { r.delete(uri, null, null) } catch (_: Exception) {}
+        throw e
+      }
+      true
+    }
+
     AsyncFunction("saveDownload") { name: String, base64: String, mime: String ->
       if (Build.VERSION.SDK_INT < 29) throw Exception("android10")
       val r = ctx.contentResolver

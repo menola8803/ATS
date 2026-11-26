@@ -30,6 +30,20 @@ const sv: ManualSection[] = [
     'Poängen mäter struktur och nyckelord, och 100 är taket. Har ditt CV redan perfekt struktur står siffran still även när AI:n förbättrar texten – ändringarna gör språket vassare för rekryteraren.',
     'Lägg in en jobbannons så räknas halva poängen på hur väl CV:t matchar annonsens ord, och då kan textändringarna synas i siffran.',
   ] },
+  { title: 'Så når du 100 %', items: [
+    'Rubriker, 32 p: skriv Profil, Erfarenhet, Utbildning och Kompetenser som egna rubriker (8 p var). Engelska namn fungerar också: Profile/Summary, Experience, Education, Skills.',
+    'Kontakt, 13 p: e-post (5 p), telefon (5 p) och en LinkedIn-länk (3 p) – i själva texten, inte i sidhuvudet.',
+    'Enkel layout, 50 p: inga tabeller, inget sidhuvud eller sidfot, inga textrutor, inga bilder och en spalt (10 p var). Färg och linjer under rubriker går bra.',
+    'Längd, 5 p: 300–900 ord (upp till ca 1 400 i Gulf-läget).',
+    'Med jobbannons väger struktur och annonsens ord hälften var. Skriv bara in ord du verkligen har – ärlighetsspärren gäller.',
+  ] },
+  { title: 'Så ska ett CV se ut', items: [
+    '1. Namn högst upp, stort. 2. En kontaktrad: e-post · telefon · ort · LinkedIn.',
+    '3. Profil: 3–4 rader om vem du är och vad du är bra på.',
+    '4. Erfarenhet, nyast först: en rad med Titel, Företag, Stad, År–År, sedan 2–4 punkter som börjar med ett verb (Ledde, Byggde, Minskade).',
+    '5. Utbildning: program, skola och år. 6. Kompetenser: nyckelord på en rad, åtskilda med ·. 7. Språk och övrigt.',
+    'Allt i en spalt, uppifrån och ner. Mallarna under Dokument › Demo visar uppställningen.',
+  ] },
   { title: 'AI-förslag', items: [
     'Tryck på Få AI-förslag. Claude läser hela CV:t och ger ett till tre förslag för varje stycke som kan bli bättre.',
     'Tryck på ett förslag så ersätter det texten. Ångra – behåll original tar tillbaka din egen text.',
@@ -122,6 +136,20 @@ const en: ManualSection[] = [
   { title: 'When the score is already 100', items: [
     'The score measures structure and keywords, and 100 is the ceiling. If your CV already has perfect structure the number stays put even as the AI improves the text – the changes sharpen the wording for the recruiter.',
     'Add a job ad and half the score counts how well the CV matches the ad’s words, so the text changes can then show in the number.',
+  ] },
+  { title: 'How to reach 100%', items: [
+    'Headings, 32 pts: write Profile, Experience, Education and Skills as their own headings (8 pts each). Swedish names work too.',
+    'Contact, 13 pts: email (5 pts), phone (5 pts) and a LinkedIn link (3 pts) – in the body text, not in the header.',
+    'Simple layout, 50 pts: no tables, no header or footer, no text boxes, no images and a single column (10 pts each). Colour and lines under headings are fine.',
+    'Length, 5 pts: 300–900 words (up to about 1,400 in Gulf mode).',
+    'With a job ad, structure and the ad’s words count half each. Only add words you truly have – the honesty lock applies.',
+  ] },
+  { title: 'How a CV should look', items: [
+    '1. Name at the top, large. 2. A contact line: email · phone · town · LinkedIn.',
+    '3. Profile: 3–4 lines on who you are and what you are good at.',
+    '4. Experience, newest first: a line with Title, Company, Town, Year–Year, then 2–4 bullets that start with a verb (Led, Built, Reduced).',
+    '5. Education: programme, school and years. 6. Skills: keywords on one line, separated by ·. 7. Languages and other.',
+    'All in one column, top to bottom. The templates under Documents › Demo show the layout.',
   ] },
   { title: 'AI suggestions', items: [
     'Tap Get AI suggestions. Claude reads the whole CV and gives one to three suggestions for every paragraph that can be improved.',

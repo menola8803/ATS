@@ -16,6 +16,8 @@ type AtsNative = {
   deleteDownloads(): Promise<number>;
   /** True when the app is signed with the developer's key (fails open on error). */
   isAuthentic(): boolean;
+  /** Copies a bundled file into Download/ATS/Demo once; returns false if it is already there. */
+  saveDemo(name: string, base64: string, mime: string): Promise<boolean>;
   /** Reads a file (content:// or file://) as Base64. */
   readBase64(uri: string): Promise<string>;
   markUpdatePending(title: string, body: string, channel: string): void;

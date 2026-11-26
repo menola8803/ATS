@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, Share, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../store';
@@ -38,6 +38,8 @@ export default function Evaluate({ onPick, onDemo, onSave, onSettings }: { onPic
   const insets = useSafeAreaInsets();
   const [mode, setMode] = useState<'orig' | 'new'>('new');
   const [details, setDetails] = useState(false);
+  const [editing, setEditing] = useState<Set<number>>(new Set());
+  const toggleEdit = (id: number) => setEditing(s2 => { const n = new Set(s2); n.has(id) ? n.delete(id) : n.add(id); return n; });
   const kbd = useKeyboardOpen();
   const scrollRef = useRef<React.ElementRef<typeof ScrollView>>(null);
   const yById = useRef<Record<number, number>>({});
@@ -120,9 +122,22 @@ export default function Evaluate({ onPick, onDemo, onSave, onSettings }: { onPic
               </View>
             ))}
             {kw ? (
-              <View style={{ gap: 4, marginTop: 4 }}>
+              <View style={{ gap: 6, marginTop: 4 }}>
                 <Text style={{ fontSize: 14, fontWeight: '700', color: theme.ink }}>{fill(t.kwMatch, { p: kw.pct })}</Text>
-                <Text style={{ fontSize: 13.5, lineHeight: 19, color: theme.muted }}>{kw.missing.length ? fill(t.kwMissing, { w: kw.missing.join(', ') }) : t.kwAllFound}</Text>
+                {kw.missing.length ? (
+                  <>
+                    <Text style={{ fontSize: 13, lineHeight: 18, color: theme.muted }}>{t.kwMissingTap}</Text>
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                      {kw.missing.map(w => (
+                        <Pressable key={w} accessibilityRole="button" accessibilityLabel={w} onPress={() => Share.share({ message: w }).catch(() => {})}
+                          style={({ pressed }) => ({ paddingHorizontal: 10, paddingVertical: 5, borderRadius: 9, borderWidth: 1, borderColor: theme.dark ? 'rgba(232,119,109,0.4)' : theme.line, backgroundColor: theme.dark ? 'rgba(232,119,109,0.1)' : theme.chip, opacity: pressed ? 0.7 : 1 })}>
+                          <Text style={{ fontSize: 12.5, fontWeight: '600', color: theme.dark ? '#F2C2BC' : theme.ink }}>{w}</Text>
+                        </Pressable>
+                      ))}
+                    </View>
+                  </>
+                ) : <Text style={{ fontSize: 13.5, color: theme.muted }}>{t.kwAllFound}</Text>}
+                {kw.found.length ? <Text style={{ fontSize: 12.5, lineHeight: 18, color: theme.muted }}>{fill(t.kwFound, { w: kw.found.slice(0, 12).join(' · ') })}</Text> : null}
                 {d.adIsDemo ? <Text style={{ fontSize: 12.5, color: theme.muted }}>{t.demoAdNote}</Text> : null}
               </View>
             ) : <Text style={{ fontSize: 13, color: theme.muted }}>{t.noAdHint}</Text>}
@@ -215,8 +230,19 @@ export default function Evaluate({ onPick, onDemo, onSave, onSettings }: { onPic
                       ))}
                     </View>
                   ) : null}
-                  {picked ? (
-                    <Pressable accessibilityRole="button" onPress={() => s.unpick(p.id)} style={{ alignSelf: 'flex-start', minHeight: 44, justifyContent: 'center' }}>
+                  <View style={{ flexDirection: 'row', gap: 10 }}>
+                    <View style={{ flex: 1 }}><SmallBtn title={editing.has(p.id) ? t.editDone : t.editText} onPress={() => toggleEdit(p.id)} /></View>
+                    <View style={{ flex: 1 }}><SmallBtn title={t.regenerateOne} onPress={() => s.regenerate(p.id)} disabled={s.busy} /></View>
+                  </View>
+                  {editing.has(p.id) ? (
+                    <View style={{ gap: 6, padding: 12, borderRadius: 16, borderWidth: 1, borderColor: look.fg, backgroundColor: theme.chip }}>
+                      <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 0.6, color: theme.muted }}>{t.editLabel.toUpperCase()}</Text>
+                      <TextInput multiline value={d.override[p.id] ?? now} onChangeText={v => s.setOverride(p.id, v)} accessibilityLabel={t.editLabel}
+                        style={{ minHeight: 80, borderRadius: 12, borderWidth: 1, borderColor: theme.line, backgroundColor: theme.card, color: theme.ink, padding: 12, fontSize: 14.5, lineHeight: 20, textAlignVertical: 'top' }} />
+                    </View>
+                  ) : null}
+                  {picked || d.override[p.id] ? (
+                    <Pressable accessibilityRole="button" onPress={() => { s.unpick(p.id); setEditing(s2 => { const n = new Set(s2); n.delete(p.id); return n; }); }} style={{ alignSelf: 'flex-start', minHeight: 44, justifyContent: 'center' }}>
                       <Text style={{ fontSize: 14, fontWeight: '600', color: look.fg }}>{t.undoKeep}</Text>
                     </Pressable>
                   ) : null}
