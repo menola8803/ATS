@@ -1,5 +1,8 @@
 # What's new in ATS
 
+## 0.1.9
+- Two ready-made CV templates under Documents > Demo to start from: a Swedish one (Elin Ek, project manager) and one for the Gulf states (Omar Haddad, engineer – with nationality, visa status and availability). Both are clean, ATS-safe and reach around 95%.
+
 ## 0.1.8
 - A new side list when you evaluate: one dot per paragraph that can be improved, coloured by state (not chosen, chosen, already ATS-friendly). Tap to jump straight to the paragraph – handy in long CVs.
 - Clearer when the score is already 100: a note explains that the structure score has a ceiling and the suggestions sharpen the wording instead, with a tip to add a job ad for a keyword score.

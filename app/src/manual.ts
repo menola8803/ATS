@@ -1,6 +1,6 @@
 // The manual inside the app (Settings › Manual), in both languages. Update it for every change a user can see, and set
 // the version to the app's version (the tests check that).
-export const MANUAL_VERSION = '0.1.8';
+export const MANUAL_VERSION = '0.1.9';
 
 export type ManualSection = { title: string; items: string[] };
 
@@ -70,6 +70,7 @@ const sv: ManualSection[] = [
     'En grön ring i hörnet visar dokumentets senaste ATS-poäng. Ej testad betyder att det inte har kontrollerats än.',
     'Filtrera mellan Alla, Testade, Ej testade och Demo.',
     'Lägger du ett CV i Download/ATS från datorn eller via USB hittas det automatiskt när du öppnar appen eller går till Dokument.',
+    'Under Demo finns två färdiga mallar att utgå från: en svensk (Elin Ek) och en för Gulfstaterna (Omar Haddad, med nationalitet och visumstatus). Båda är rena och når runt 95 %.',
   ] },
   { title: 'Tips för ett ATS-vänligt CV', items: [
     'Använd vanliga rubriker, inte egna påhittade namn.',
@@ -157,6 +158,7 @@ const en: ManualSection[] = [
     'A green ring in the corner shows the document’s latest ATS score. Not tested means it has not been checked yet.',
     'Filter between All, Tested, Not tested and Demo.',
     'If you put a CV in Download/ATS from a computer or over USB, it is found automatically when you open the app or go to Documents.',
+    'Under Demo there are two ready-made templates to start from: a Swedish one (Elin Ek) and one for the Gulf states (Omar Haddad, with nationality and visa status). Both are clean and reach around 95%.',
   ] },
   { title: 'Tips for an ATS-friendly CV', items: [
     'Use standard headings, not names of your own.',

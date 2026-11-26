@@ -1,5 +1,8 @@
 # Nyheter i ATS
 
+## 0.1.9
+- Två färdiga CV-mallar under Dokument › Demo att utgå från: en svensk (Elin Ek, projektledare) och en för Gulfstaterna (Omar Haddad, ingenjör – med nationalitet, visumstatus och tillgänglighet). Båda är rena, ATS-säkra och når runt 95 %.
+
 ## 0.1.8
 - Ny scroll-lista på sidan när du utvärderar: en prick per stycke som kan förbättras, färgad efter läge (ej vald, vald, redan ATS-vänlig). Tryck för att hoppa direkt till stycket – smidigt i långa CV.
 - Tydligare när poängen redan är 100: en ruta förklarar att struktur-poängen har ett tak och att förslagen i stället skärper språket, med tips om att lägga in en jobbannons för att få en nyckelordspoäng.
