@@ -1,6 +1,6 @@
 // The manual inside the app (Settings › Manual), in both languages. Update it for every change a user can see, and set
 // the version to the app's version (the tests check that).
-export const MANUAL_VERSION = '0.1.9';
+export const MANUAL_VERSION = '0.1.10';
 
 export type ManualSection = { title: string; items: string[] };
 
@@ -16,6 +16,11 @@ const sv: ManualSection[] = [
     'Rubriker: att Profil, Erfarenhet, Utbildning och Kompetenser finns. Kontakt: e-post, telefon och gärna LinkedIn i själva texten.',
     'Längd: ungefär 300–900 ord är lagom.',
     'Med en jobbannons räknas också hur många av annonsens viktiga ord som finns i CV:t, och de som saknas visas.',
+  ] },
+  { title: 'Förbättra LinkedIn-text', items: [
+    'Från hemskärmen kan du förbättra text till din LinkedIn-profil. Växla mellan Sammanfattning (jag-form) och Erfarenhet (punkter).',
+    'Klistra in din text, lägg eventuellt till rollen eller annonsen du siktar på (eller återanvänd jobbannonsen), och tryck Förbättra texten.',
+    'Du får original mot förbättrat med en Kopiera-knapp. Ärlighetsspärren gäller – AI:n lägger aldrig till fakta som inte finns i din text.',
   ] },
   { title: 'Hoppa mellan styckena', items: [
     'När förslagen är hämtade visas en liten lista med prickar på högerkanten – en per stycke som kan förbättras. Tryck på en prick för att hoppa direkt till det stycket.',
@@ -104,6 +109,11 @@ const en: ManualSection[] = [
     'Headings: that Profile, Experience, Education and Skills are present. Contact: email, phone and ideally LinkedIn in the body text.',
     'Length: about 300–900 words is right.',
     'With a job ad, the score also counts how many of the ad’s important words are in the CV, and the missing ones are shown.',
+  ] },
+  { title: 'Improve LinkedIn text', items: [
+    'From the home screen you can improve text for your LinkedIn profile. Switch between Summary (first person) and Experience (bullet points).',
+    'Paste your text, optionally add the role or job ad you are aiming for (or reuse the job ad), and tap Improve the text.',
+    'You get original versus improved with a Copy button. The honesty lock applies – the AI never adds facts that are not in your text.',
   ] },
   { title: 'Jump between paragraphs', items: [
     'Once the suggestions are fetched, a small list of dots appears on the right edge – one per paragraph that can be improved. Tap a dot to jump straight to that paragraph.',

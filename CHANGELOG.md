@@ -1,5 +1,8 @@
 # Nyheter i ATS
 
+## 0.1.10
+- Ny LinkedIn-förbättrare från hemskärmen: klistra in din sammanfattning eller erfarenhetstext, så skärper AI:n den och du kopierar tillbaka. Växla mellan Sammanfattning (jag-form) och Erfarenhet (punkter), sikta mot en roll eller återanvänd jobbannonsen, och få ett par förslag att välja mellan. Ärlighetsspärren gäller – inga påhittade fakta.
+
 ## 0.1.9
 - Två färdiga CV-mallar under Dokument › Demo att utgå från: en svensk (Elin Ek, projektledare) och en för Gulfstaterna (Omar Haddad, ingenjör – med nationalitet, visumstatus och tillgänglighet). Båda är rena, ATS-säkra och når runt 95 %.
 

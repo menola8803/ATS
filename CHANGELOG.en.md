@@ -1,5 +1,8 @@
 # What's new in ATS
 
+## 0.1.10
+- New LinkedIn improver from the home screen: paste your summary or experience text and the AI sharpens it for you to copy back. Switch between Summary (first person) and Experience (bullet points), aim at a role or reuse the job ad, and get a couple of versions to choose from. The honesty lock applies – no invented facts.
+
 ## 0.1.9
 - Two ready-made CV templates under Documents > Demo to start from: a Swedish one (Elin Ek, project manager) and one for the Gulf states (Omar Haddad, engineer – with nationality, visa status and availability). Both are clean, ATS-safe and reach around 95%.
 
