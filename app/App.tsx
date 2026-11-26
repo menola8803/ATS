@@ -23,6 +23,7 @@ import Home from './src/screens/Home';
 import Evaluate from './src/screens/Evaluate';
 import Library from './src/screens/Library';
 import Picker from './src/screens/Picker';
+import LinkedIn from './src/screens/LinkedIn';
 import Save from './src/screens/Save';
 import Compare from './src/screens/Compare';
 import Settings, { ManualScreen, PrivacyScreen, UninstallScreen, UpdateScreen } from './src/screens/Settings';
@@ -124,6 +125,7 @@ function Content() {
     case 'save': return <Save onBack={pop} onCompare={() => push({ name: 'compare' })} />;
     case 'compare': return <Compare onBack={pop} onImprove={() => toTabs('eval')} />;
     case 'picker': return <Picker items={items} onOpen={d => { pop(); openItem(d); }} onBrowse={() => { pop(); pick(); }} onBack={pop} />;
+    case 'linkedin': return <LinkedIn onBack={pop} onSettings={toSettings} />;
     case 'settings': return <Settings onBack={pop} go={name => push({ name })} glow={glow} />;
     case 'manual': return <ManualScreen onBack={pop} />;
     case 'privacy': return <PrivacyScreen onBack={pop} />;
@@ -133,7 +135,7 @@ function Content() {
       return (
         <Screen bottom={false}>
           <View style={{ flex: 1 }}>
-            {tab === 'home' && <Home items={items} onEvaluate={toPicker} onOpen={openItem} onAllDocs={() => setTab('docs')} onGear={toSettings} glow={glow} />}
+            {tab === 'home' && <Home items={items} onEvaluate={toPicker} onOpen={openItem} onAllDocs={() => setTab('docs')} onGear={toSettings} onLinkedIn={() => push({ name: 'linkedin' })} glow={glow} />}
             {tab === 'eval' && <Evaluate onPick={toPicker} onDemo={openDemo} onSave={() => push({ name: 'save' })} onSettings={toSettings} />}
             {tab === 'docs' && <Library items={items} demos={demos} onOpen={openItem} onGear={toSettings} glow={glow} />}
           </View>

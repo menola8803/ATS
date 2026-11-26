@@ -178,6 +178,72 @@ async function withRetry<T>(fn: () => Promise<T>): Promise<T> {
   }
 }
 
+// ---- LinkedIn text improver: improve a pasted summary or experience block, honesty lock on ----
+export type TextKind = 'summary' | 'experience';
+
+export function textSystemPrompt(kind: TextKind, tone: Tone, appLang: 'sv' | 'en'): string {
+  const ph = appLang === 'sv' ? '[ANTAL]' : '[NUMBER]';
+  const shape = kind === 'summary'
+    ? 'This is a LinkedIn "About" summary. Write it in the first person, 3 to 5 short sentences, confident but not inflated.'
+    : 'This is the text under one LinkedIn role. Write it as 3 to 6 bullet points, each on its own line (separated by a newline) and starting with a strong past-tense verb; keep each bullet to one line.';
+  return [
+    'You improve a piece of a person\'s LinkedIn profile so recruiters read it well.',
+    'HONESTY LOCK – these rules always apply and override everything else:',
+    '- Never add facts that are not in the text: no new employers, titles, dates, years, numbers, percentages, tools, skills, certificates or achievements.',
+    '- You may reword, restructure, shorten and use stronger verbs for what the text already says.',
+    `- If a stronger version needs a detail the text does not give, write a CAPITALS placeholder in square brackets in the text's language, for example ${ph}, [PROCENT], [VERKTYG] or [NUMBER], [PERCENT], [TOOL]. Never guess the value.`,
+    shape,
+    'Write in the same language as the input text.',
+    'If a target role or job ad is given, steer the wording toward it only where the text already supports it.',
+    `Tone: ${TONE[tone]}.`,
+    'Give 1 to 2 improved versions.',
+    'Answer with JSON only, no other text: {"variants":[{"text":"..."}]}',
+  ].join('\n');
+}
+
+export function textUserPrompt(text: string, ad?: string): string {
+  const parts = [];
+  if (ad && ad.trim()) parts.push(`Target role or job ad:\n${ad.trim()}`);
+  parts.push(`Text to improve:\n${text.trim()}`);
+  return parts.join('\n\n');
+}
+
+/** Keeps numbers honest: any number not already in the original is replaced with a placeholder. */
+export function guardText(original: string, text: string, lang: 'sv' | 'en'): string {
+  const known = new Set(original.match(/\d+(?:[.,]\d+)?/g) ?? []);
+  const ph = lang === 'sv' ? '[ANTAL]' : '[NUMBER]';
+  return text.replace(/\d+(?:[.,]\d+)?/g, n => (known.has(n) ? n : ph)).replace(/[ \t]+/g, ' ').replace(/ *\n */g, '\n').trim();
+}
+
+export function parseVariants(answer: string): string[] {
+  const cleaned = answer.replace(/```(?:json)?/gi, '').trim();
+  const a = cleaned.indexOf('{');
+  if (a < 0) throw Object.assign(new Error('no JSON in answer'), { kind: 'answer' as ApiError });
+  let list: any[] = [];
+  try {
+    const j = JSON.parse(cleaned.slice(a, cleaned.lastIndexOf('}') + 1));
+    list = Array.isArray(j?.variants) ? j.variants : [];
+  } catch {
+    const arr = cleaned.indexOf('[', cleaned.indexOf('variants'));
+    list = salvageObjects(cleaned.slice(arr >= 0 ? arr : a)).filter(o => typeof o?.text === 'string');
+  }
+  const out = list.map(v => (typeof v?.text === 'string' ? v.text : '')).filter(Boolean);
+  if (!out.length) throw Object.assign(new Error('no JSON in answer'), { kind: 'answer' as ApiError });
+  return out;
+}
+
+/** Improved versions of a pasted LinkedIn summary or experience block. */
+export async function improveText(opts: {
+  text: string; kind: TextKind; ad?: string; apiKey: string; model: ModelKey; tone: Tone; appLang: 'sv' | 'en'; f?: typeof fetch; signal?: AbortSignal;
+}): Promise<string[]> {
+  if (!opts.text.trim()) return [];
+  const answer = await withRetry(() => askClaude({
+    apiKey: opts.apiKey, model: modelId(opts.model), f: opts.f, signal: opts.signal,
+    system: textSystemPrompt(opts.kind, opts.tone, opts.appLang), user: textUserPrompt(opts.text, opts.ad),
+  }));
+  return parseVariants(answer).map(t => guardText(opts.text, t, opts.appLang)).filter(Boolean).slice(0, 2);
+}
+
 /** Suggestions for the given paragraphs of the CV. */
 export async function suggest(opts: {
   cv: Cv; ids: number[]; ad?: string; apiKey: string; model: ModelKey; count: number; tone: Tone; appLang: 'sv' | 'en'; region?: Region; f?: typeof fetch; signal?: AbortSignal;

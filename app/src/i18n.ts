@@ -138,6 +138,18 @@ const sv = {
   inProgress: 'Pågår', progressChosen: '{n} av {m} förslag valda', draftDone: 'Klar',
   startOver: 'Börja om', startOverTitle: 'Börja om?', startOverBody: 'Dina valda förslag och ifyllnader för det här CV:t tas bort. CV:t ändras inte.', startOverYes: 'Börja om',
 
+  // LinkedIn text improver
+  linkedinTitle: 'Förbättra LinkedIn-text', linkedinSub: 'Klistra in, förbättra, kopiera tillbaka',
+  linkedinCard: 'Förbättra LinkedIn-text', linkedinCardSub: 'Klistra in din text · AI skärper den',
+  liSummary: 'Sammanfattning', liExperience: 'Erfarenhet',
+  liSummaryHint: 'Din "Om"-text i jag-form.', liExperienceHint: 'Texten under en roll, som punkter.',
+  liYourText: 'Din text', liTextPlaceholder: 'Klistra in din text här…',
+  liTarget: 'Roll eller annons du siktar på', liOptional: 'valfritt', liUseAd: 'Använd jobbannonsen',
+  liImprove: 'Förbättra texten', liImproving: 'Förbättrar…',
+  liOriginal: 'Original', liImproved: 'Förbättrat', liVariant: 'Förslag {n} av {m}', liNext: 'Nästa förslag',
+  liCopy: 'Kopiera', liCopied: 'Kopierad', liEmpty: 'Klistra in text först.',
+  liLockOn: 'Ärlighetsspärr på · AI:n lägger aldrig till fakta som inte finns i din text.',
+
   // already-perfect feedback
   scoreMaxTitle: 'Strukturen är redan på topp',
   scoreMaxBody: 'Poängen mäter struktur och nyckelord, och mer än 100 går inte. Förslagen gör texten vassare för rekryteraren som läser, även om siffran står still.',
@@ -307,6 +319,17 @@ const en: Strings = {
 
   inProgress: 'In progress', progressChosen: '{n} of {m} suggestions chosen', draftDone: 'Done',
   startOver: 'Start over', startOverTitle: 'Start over?', startOverBody: 'Your chosen suggestions and fills for this CV are removed. The CV itself is not changed.', startOverYes: 'Start over',
+
+  linkedinTitle: 'Improve LinkedIn text', linkedinSub: 'Paste, improve, copy back',
+  linkedinCard: 'Improve LinkedIn text', linkedinCardSub: 'Paste your text · the AI sharpens it',
+  liSummary: 'Summary', liExperience: 'Experience',
+  liSummaryHint: 'Your "About" text, in the first person.', liExperienceHint: 'The text under one role, as bullet points.',
+  liYourText: 'Your text', liTextPlaceholder: 'Paste your text here…',
+  liTarget: 'Role or job ad you are aiming for', liOptional: 'optional', liUseAd: 'Use the job ad',
+  liImprove: 'Improve the text', liImproving: 'Improving…',
+  liOriginal: 'Original', liImproved: 'Improved', liVariant: 'Version {n} of {m}', liNext: 'Next version',
+  liCopy: 'Copy', liCopied: 'Copied', liEmpty: 'Paste some text first.',
+  liLockOn: 'Honesty lock on · the AI never adds facts that are not in your text.',
 
   scoreMaxTitle: 'The structure is already at the top',
   scoreMaxBody: 'The score measures structure and keywords, and 100 is the ceiling. The suggestions sharpen the wording for the recruiter who reads it, even though the number stays put.',

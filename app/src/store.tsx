@@ -23,6 +23,7 @@ type Saved = {
   useAd: boolean;             // the job ad steers the suggestions
   showDemo: boolean;          // the three demo CVs are shown under Documents
   region: Region;             // eu (Sweden/Europe) or gulf (GCC)
+  linkedin: { summary: string; experience: string }; // last pasted LinkedIn texts
   ad: string;                 // the job ad pasted on the home screen
   scores: Record<string, { score: number; at: number; thumb?: Thumb }>; // latest ATS score and page miniature per document key
   drafts: Record<string, Draft>; // unfinished work per document key
@@ -36,7 +37,7 @@ const API_KEY = 'ats.apikey.v1';
 const MAX_RECENT = 40;
 
 const empty = (): Saved => ({
-  themeName: 'dark', lang: 'en', model: 'fast', count: 2, tone: 'neutral', useAd: true, showDemo: true, region: 'eu', ad: '',
+  themeName: 'dark', lang: 'en', model: 'fast', count: 2, tone: 'neutral', useAd: true, showDemo: true, region: 'eu', linkedin: { summary: '', experience: '' }, ad: '',
   scores: {}, drafts: {}, recent: [], updateTag: '', updateChecked: 0, updateAuto: true, folderMade: false,
 });
 
@@ -70,6 +71,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           if (merged.lang !== 'sv' && merged.lang !== 'en') merged.lang = 'en';
           if (merged.region !== 'eu' && merged.region !== 'gulf') merged.region = 'eu';
           if (!merged.drafts || typeof merged.drafts !== 'object') merged.drafts = {};
+          if (!merged.linkedin || typeof merged.linkedin !== 'object') merged.linkedin = { summary: '', experience: '' };
           if (![1, 2, 3].includes(merged.count)) merged.count = 2;
           if (!Array.isArray(merged.recent)) merged.recent = [];
           setS(merged);

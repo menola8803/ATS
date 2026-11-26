@@ -9,8 +9,8 @@ import { fill } from '../i18n';
 import { DocItem } from '../library';
 import { DocCard } from './Library';
 
-export default function Home({ items, onEvaluate, onOpen, onAllDocs, onGear, glow }: {
-  items: DocItem[]; onEvaluate: () => void; onOpen: (d: DocItem) => void; onAllDocs: () => void; onGear: () => void; glow: boolean;
+export default function Home({ items, onEvaluate, onOpen, onAllDocs, onGear, onLinkedIn, glow }: {
+  items: DocItem[]; onEvaluate: () => void; onOpen: (d: DocItem) => void; onAllDocs: () => void; onGear: () => void; onLinkedIn: () => void; glow: boolean;
 }) {
   const { theme, t, ad, setPrefs } = useApp();
   const look = useButtonLook();
@@ -66,6 +66,20 @@ export default function Home({ items, onEvaluate, onOpen, onAllDocs, onGear, glo
           ) : null}
         </View>
       ) : null}
+
+      <Pressable accessibilityRole="button" onPress={onLinkedIn}
+        style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 14, padding: 14, borderRadius: 22, borderWidth: 1, borderColor: theme.line, backgroundColor: theme.card, opacity: pressed ? 0.85 : 1 })}>
+        <View style={{ width: 56, height: 56, borderRadius: 16, backgroundColor: theme.chip, alignItems: 'center', justifyContent: 'center' }}>
+          <Svg width={26} height={26} viewBox="0 0 24 24">
+            <Path d="M4 7h3v13H4zM5.5 3a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM10 7h3v2a3.5 3.5 0 0 1 3-1.6c3 0 4 2 4 4.8V20h-3v-6.4c0-1.5-.5-2.5-1.9-2.5-1 0-1.6.7-1.9 1.4-.1.2-.2.6-.2 1V20h-3z" fill={theme.dark ? '#F3D9A0' : theme.accent} />
+          </Svg>
+        </View>
+        <View style={{ flex: 1, gap: 2 }}>
+          <Text style={{ fontSize: 19, fontWeight: '700', color: theme.ink }}>{t.linkedinCard}</Text>
+          <Text style={{ fontSize: 13, color: theme.muted }}>{t.linkedinCardSub}</Text>
+        </View>
+        <Text style={{ fontSize: 22, color: look.fg }}>›</Text>
+      </Pressable>
 
       <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 6 }}>
         <Text style={{ flex: 1, fontSize: 12, fontWeight: '700', letterSpacing: 1.2, color: theme.accent, textTransform: 'uppercase' }}>{fill(t.savedDocs, { n: items.length })}</Text>

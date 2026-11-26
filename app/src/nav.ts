@@ -3,6 +3,7 @@ export type Route =
   | { name: 'save' }
   | { name: 'compare' }
   | { name: 'picker' }
+  | { name: 'linkedin' }
   | { name: 'settings' }
   | { name: 'manual' }
   | { name: 'privacy' }
