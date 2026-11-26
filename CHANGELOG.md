@@ -1,5 +1,12 @@
 # Nyheter i ATS
 
+## 0.1.11
+- Redigera ett förslag innan du använder det: tryck Redigera på ett stycke och justera texten för hand – din version vinner och poängen uppdateras.
+- Gör om ett enskilt stycke: tryck Gör om för nya förslag på just det stycket, utan att hämta om hela CV:t.
+- Saknade annonsord visas nu som tryckbara chips i poängdetaljerna (tryck för att kopiera), tillsammans med orden som redan finns.
+- De färdiga demona och mallarna kopieras nu även som riktiga filer till Download/ATS/Demo på telefonen.
+- Manualen har två nya avsnitt: "Så når du 100 %" och "Så ska ett CV se ut".
+
 ## 0.1.10
 - Ny LinkedIn-förbättrare från hemskärmen: klistra in din sammanfattning eller erfarenhetstext, så skärper AI:n den och du kopierar tillbaka. Växla mellan Sammanfattning (jag-form) och Erfarenhet (punkter), sikta mot en roll eller återanvänd jobbannonsen, och få ett par förslag att välja mellan. Ärlighetsspärren gäller – inga påhittade fakta.
 

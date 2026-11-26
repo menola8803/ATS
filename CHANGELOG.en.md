@@ -1,5 +1,12 @@
 # What's new in ATS
 
+## 0.1.11
+- Edit a suggestion before you use it: tap Edit on a paragraph and adjust the text by hand – your version wins and the score updates.
+- Regenerate a single paragraph: tap Regenerate for fresh suggestions on just that paragraph, without re-running the whole CV.
+- Missing job-ad keywords now show as tappable chips in the score details (tap to copy), alongside the words already found.
+- The bundled demos and templates are now also copied as real files to Download/ATS/Demo on the phone.
+- The manual has two new sections: "How to reach 100%" and "How a CV should look".
+
 ## 0.1.10
 - New LinkedIn improver from the home screen: paste your summary or experience text and the AI sharpens it for you to copy back. Switch between Summary (first person) and Experience (bullet points), aim at a role or reuse the job ad, and get a couple of versions to choose from. The honesty lock applies – no invented facts.
 
