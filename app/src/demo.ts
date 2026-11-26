@@ -8,6 +8,8 @@ const ASSETS: Record<string, number> = {
   jonas: require('../assets/demo/Demo_Jonas_Berg_CV.docx'),
   sara: require('../assets/demo/Demo_Sara_Nilsson_CV.odt'),
   mira: require('../assets/demo/Demo_Mira_Andersson_CV.docx'),
+  elin: require('../assets/demo/Demo_Elin_Ek_Mall.docx'),
+  omar: require('../assets/demo/Demo_Omar_Haddad_Mall_Gulf.docx'),
 };
 
 export const DEMOS: Demo[] = DATA.map(d => ({ ...d, asset: ASSETS[d.id] }));

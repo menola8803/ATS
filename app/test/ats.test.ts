@@ -32,4 +32,16 @@ ok(evaluate(withPhoto, undefined, 'gulf').base === evaluate(mira, undefined, 'gu
 const visaCv = readCv('docx', unzip(demo('Demo_Mira_Andersson_CV.docx')));
 ok(evaluate({ ...visaCv, paras: [...visaCv.paras, { ...visaCv.paras[0], id: 999, text: 'Nationality: Swedish, transferable QID visa, available immediately' }] }, undefined, 'gulf')
   .checks.filter(c => ['nationality', 'visa', 'availability'].includes(c.id)).every(c => c.ok), 'Gulf personal details are detected');
+// The bundled templates are clean and score about 95 (LinkedIn is deliberately left out).
+const elin = readCv('docx', unzip(demo('Demo_Elin_Ek_Mall.docx')));
+const elinScore = evaluate(elin, undefined, 'eu');
+ok(elin.layout.tables === 0 && elin.layout.images === 0 && elin.layout.textBoxes === 0 && !elin.layout.headerText.trim() && !elin.layout.columns, 'Elin template is ATS-clean');
+ok(elinScore.score >= 95 && elinScore.score < 100, `Elin template scores ~95 (got ${elinScore.score})`);
+ok(elinScore.checks.find(c => c.id === 'linkedin')!.ok === false, 'Elin template leaves LinkedIn out');
+
+const omar = readCv('docx', unzip(demo('Demo_Omar_Haddad_Mall_Gulf.docx')));
+const omarScore = evaluate(omar, undefined, 'gulf');
+ok(omar.layout.tables === 0 && omar.layout.images === 0 && omar.layout.textBoxes === 0, 'Omar Gulf template is ATS-clean');
+ok(omarScore.score >= 95 && omarScore.score < 100, `Omar Gulf template scores ~95 in Gulf mode (got ${omarScore.score})`);
+ok(omarScore.checks.filter(c => ['nationality', 'visa'].includes(c.id)).every(c => c.ok), 'Omar template states nationality and visa status');
 done('ats');

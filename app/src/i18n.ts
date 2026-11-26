@@ -67,6 +67,7 @@ const sv = {
   badgesHelp: 'ⓘ  Vad betyder märkena?', helpTested: 'Testad – ATS-poäng 0–100 från senaste kontrollen', helpNot: 'Inte kontrollerad än – tryck för att testa',
   helpDemo: 'Exempel-CV som följer med appen – prova utan ditt eget', countText: '{a} testade · {b} ej testade · {c} demo',
   demoJonas: 'Demo · IT-tekniker · svag', demoSara: 'Demo · Ekonomiassistent · medel', demoMira: 'Demo · Undersköterska · stark',
+  demoElin: 'Mall · Sverige · ~95 %', demoOmar: 'Mall · Gulfstaterna · ~95 %',
   docSaved: 'Sparad av ATS', docOpened: 'Öppnad', noneHere: 'Inga dokument här.',
 
   // settings
@@ -241,6 +242,7 @@ const en: Strings = {
   badgesHelp: 'ⓘ  What do the badges mean?', helpTested: 'Tested – ATS score 0–100 from the latest check', helpNot: 'Not checked yet – tap to evaluate',
   helpDemo: 'Sample CVs that come with the app – try it without your own', countText: '{a} tested · {b} not tested · {c} demo',
   demoJonas: 'Demo · IT technician · weak', demoSara: 'Demo · Accounts assistant · medium', demoMira: 'Demo · Assistant nurse · strong',
+  demoElin: 'Template · Sweden · ~95%', demoOmar: 'Template · Gulf states · ~95%',
   docSaved: 'Saved by ATS', docOpened: 'Opened', noneHere: 'No documents here.',
 
   appearance: 'Appearance', theme: 'Theme', themeDark: 'Dark', themeBeige: 'Beige', themeNote: 'The same themes as Alif: dark petrol with gold and mint, or light beige.',
